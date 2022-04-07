@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" name="viewport" content="width=device-width,initial-scale=1">
+    <title>index</title>
+</head>
+
+<body>
+    <div id="root">
+    </div>
+</body>
+{% csrf_token %}
+{% load static %}
+<script src="{% static "/app.bundle.js" %}"></script>
+</html>
