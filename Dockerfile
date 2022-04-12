@@ -16,6 +16,7 @@ RUN pip install -r requirements.txt
 COPY apiv1 .
 COPY manage.py .
 COPY docker-entrypoint.sh .
+RUN mkdir -p /run/daphne
 
 EXPOSE 8000
 EXPOSE 6379

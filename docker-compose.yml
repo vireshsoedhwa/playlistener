@@ -18,6 +18,7 @@ services:
   app:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
+    # command: supervisord -c supervisord.conf -n
     image: playlistener
     # restart: unless-stopped
     # tty: true
