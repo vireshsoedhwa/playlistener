@@ -13,7 +13,7 @@ module.exports = merge(common, {
             // browse to http://localhost:3000/ during development,
             // ./public directory is being served
             host: 'localhost',
-            port: 8000,
+            port: 9000,
             proxy: 'http://localhost:8000/',
         },
             // // plugin options

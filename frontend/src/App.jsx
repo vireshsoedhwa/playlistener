@@ -27,32 +27,27 @@ export default function App() {
     const ws = useRef(null);
 
     useInterval(async () => {
-        // if (Status == 'rejected' || Status == null) {
-        //     console.log('rejected ' + Status);
-        // }
-        // else {
-        //     QueryStatus();
-        // }
-        if (Polling) {
-            QueryStatus();
-            console.log("polling")
+        if (!Connect) {
+            makeConnection();
+            console.log("making connection")
         }
         // setProgress((prevProgress) => (prevProgress >= 100 ? 0 : prevProgress + 10));
     }, 1000);
 
 
-    useEffect(() => {
-        if (!Connect) {
-            makeConnection();
-            console.log("making connection")
-        }
-    }, [Connect]);
+    // useEffect(() => {
+    //     console.log("ayayayayay")
+    //     if (!Connect) {
+    //         makeConnection();
+    //         console.log("making connection")
+    //     }
+    // }, [Connect]);
 
     const makeConnection = () => {
         ws.current = new WebSocket(
             'ws://'
             + window.location.host
-            + '/ws/chat/'
+            + '/ws/'
         );
 
         ws.current.onopen = () => {
@@ -62,68 +57,71 @@ export default function App() {
         ws.current.onclose = (e) => {
             console.log("ws closed");
             console.error('socket closed unexpectedly ' + e);
-            setConnect(false)
+            setTimeout(function () {
+                setConnect(false)
+            }, 5000);
+
         }
 
         ws.current.onmessage = e => {
             const message = JSON.parse(e.data);
 
             setStatus(message.status)
-            if (message.status == 'submitted') {
-                setPolling(true)
-            }
+            // if (message.status == 'submitted') {
+            //     setPolling(true)
+            // }
 
-            if (message.status == 'converted') {
-                setPolling(false)
-            }
+            // if (message.status == 'converted') {
+            //     setPolling(false)
+            // }
 
-            if (message.status == 'downloading') {
-                let progress = (message.downloaded_bytes / message.total_bytes) * 100
-                setProgress(progress)
-            }
-            if (message.status == 'finished' || message.status == 'converted') {
-                setProgress(100)
-            }
-            if (message.status == 'converted') {
-                setProgress(100)
-            }
+            // if (message.status == 'downloading') {
+            //     let progress = (message.downloaded_bytes / message.total_bytes) * 100
+            //     setProgress(progress)
+            // }
+            // if (message.status == 'finished' || message.status == 'converted') {
+            //     setProgress(100)
+            // }
+            // if (message.status == 'converted') {
+            //     setProgress(100)
+            // }
             // console.log("e", e.data);
         };
     }
 
-    const PostUrl = () => {
-        const data = { url: Url };
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
-        // console.log(csrftoken)
-        let filename = "download.mp3";
-        fetch('/api/submitlink', {
-            method: 'POST', // or 'PUT'
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-                'X-CSRFTOKEN': csrftoken
-            },
-            body: JSON.stringify(data),
-        })
-            .then(response => {
-                filename = response.headers.get('Content-Disposition').split('=')[1].slice(1, -1);
-                return response.blob()
-            })
-            .then((blob) => {
-                var a = document.createElement('a');
-                a.href = window.URL.createObjectURL(blob);
-                var attr = document.createAttribute("download");
-                a.setAttributeNode(attr);
-                a.style.display = 'none';
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-    }
+    // const PostUrl = () => {
+    //     const data = { url: Url };
+    //     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+    //     // console.log(csrftoken)
+    //     let filename = "download.mp3";
+    //     fetch('/api/submitlink', {
+    //         method: 'POST', // or 'PUT'
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Access-Control-Allow-Origin': '*',
+    //             'X-CSRFTOKEN': csrftoken
+    //         },
+    //         body: JSON.stringify(data),
+    //     })
+    //         .then(response => {
+    //             filename = response.headers.get('Content-Disposition').split('=')[1].slice(1, -1);
+    //             return response.blob()
+    //         })
+    //         .then((blob) => {
+    //             var a = document.createElement('a');
+    //             a.href = window.URL.createObjectURL(blob);
+    //             var attr = document.createAttribute("download");
+    //             a.setAttributeNode(attr);
+    //             a.style.display = 'none';
+    //             a.download = filename;
+    //             document.body.appendChild(a);
+    //             a.click();
+    //             a.remove();
+    //         })
+    //         .catch((error) => {
+    //             console.error('Error:', error);
+    //         });
+    // }
 
     const ChangeURL = (value) => {
         // console.log(value.target.value)
@@ -137,12 +135,12 @@ export default function App() {
         }));
     }
 
-    const QueryStatus = () => {
-        ws.current.send(JSON.stringify({
-            'request_type': 'polling',
-            'url': Url
-        }));
-    }
+    // const QueryStatus = () => {
+    //     ws.current.send(JSON.stringify({
+    //         'request_type': 'polling',
+    //         'url': Url
+    //     }));
+    // }
 
     return (
         <React.Fragment>
@@ -172,7 +170,7 @@ export default function App() {
                 <Grid item xs={6}>
                     {/* {Status} */}
                     <CircularProgressWithLabel value={Progress} />
-                    { Status === 'converted'?
+                    {Status === 'converted' ?
                         <Button size="small" variant="contained" color="primary"
                             onClick={PostUrl}
                         >
