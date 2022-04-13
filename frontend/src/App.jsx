@@ -11,6 +11,9 @@ import Button from '@mui/material/Button';
 
 import CircularProgressWithLabel from './CircularStatic';
 
+import InputField from './InputField';
+import SubmitButton from './SubmitButton';
+
 
 
 export default function App() {
@@ -20,28 +23,42 @@ export default function App() {
     const [Polling, setPolling] = useState(false);
     const [Progress, setProgress] = useState(0);
 
+    const [Pollingdelay, setPollingdelay] = useState(null);
     /*
         status list:
-        idle, rejected , downloading , finished, converted
+        idle, valid, rejected , downloading , finished, converting
     */
     const ws = useRef(null);
 
+    // const getId(url) {
+    //     var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    //     var match = url.match(regExp);
+
+    //     if (match && match[2].length == 11) {
+    //         return match[2];
+    //     } else {
+    //         return 'error';
+    //     }
+    // }
+
     useInterval(async () => {
+        console.log("polling")
+        if (!Connect) {
+            makeConnection();
+            console.log("retrying connection");
+        }
+        // setProgress((prevProgress) => (prevProgress >= 100 ? 0 : prevProgress + 10));
+    }, Pollingdelay);
+
+
+    useEffect(() => {
+        console.log("initial connection")
         if (!Connect) {
             makeConnection();
             console.log("making connection")
+            setPollingdelay(3000);
         }
-        // setProgress((prevProgress) => (prevProgress >= 100 ? 0 : prevProgress + 10));
-    }, 1000);
-
-
-    // useEffect(() => {
-    //     console.log("ayayayayay")
-    //     if (!Connect) {
-    //         makeConnection();
-    //         console.log("making connection")
-    //     }
-    // }, [Connect]);
+    }, [Connect]);
 
     const makeConnection = () => {
         ws.current = new WebSocket(
@@ -57,9 +74,9 @@ export default function App() {
         ws.current.onclose = (e) => {
             console.log("ws closed");
             console.error('socket closed unexpectedly ' + e);
-            setTimeout(function () {
-                setConnect(false)
-            }, 5000);
+            setConnect(false)
+            // setTimeout(function () {
+            // }, 5000);
 
         }
 
@@ -123,12 +140,13 @@ export default function App() {
     //         });
     // }
 
-    const ChangeURL = (value) => {
-        // console.log(value.target.value)
-        setUrl(value.target.value)
-    }
 
-    const SubmitUrl = () => {
+    // const setStatus = () =>{
+
+    // }
+
+    const Submit = () => {
+        // console.log(url)
         ws.current.send(JSON.stringify({
             'request_type': 'submit',
             'url': Url
@@ -142,20 +160,54 @@ export default function App() {
     //     }));
     // }
 
+    const imgstyle = {
+        objectfit: 'contain',
+        width: '300px',
+        height: 'auto',
+        border: 'solid 1px #CCC'
+    };
+
     return (
         <React.Fragment>
             <Container maxWidth="sm">
-                <Grid item xs={6}>
-                    <form noValidate autoComplete="off">
-                        <TextField id="standard-basic" label="Standard" onChange={ChangeURL} />
-                        <Button size="small" variant="contained" color="primary"
+                <Grid item >
+                    {/* <form noValidate autoComplete="off"> */}
+                    {/* <TextField id="standard-basic" label="Standard" onChange={ChangeURL} /> */}
+
+                    <InputField seturl={setUrl} connect={Connect} setstatus={setStatus} />
+
+
+                    {/* <Button size="small" variant="contained" color="primary"
                             onClick={SubmitUrl}
                         >
                             Submit
-                        </Button>
-                    </form>
+                        </Button> */}
+                    {/* </form> */}
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item >
+                    {(Status === 'idle' || Status === 'rejected') ?
+                        <div>
+
+                        </div>
+                        :
+                        <div>
+                            <div>
+                                <img src={"//img.youtube.com/vi/" + Url + "/sddefault.jpg"} alt="youtube thumbnail" style={imgstyle} />
+                            </div>
+                        </div>
+                    }
+
+                    {Status === 'valid' ?
+                        <div>
+                            <SubmitButton submit={Submit} />
+                        </div>
+                        :
+                        <div>
+
+                        </div>
+                    }
+                </Grid>
+                <Grid item >
                     {Connect ?
                         <h2>
                             Connected
@@ -167,8 +219,19 @@ export default function App() {
                     }
                     {Status}
                 </Grid>
-                <Grid item xs={6}>
-                    {/* {Status} */}
+                <Grid item >
+
+
+                    {/* {Status === 'valid' ?
+                        <SubmitButton />
+                    :
+                    <div></div>                
+                    } */}
+
+                </Grid>
+
+                {/* <Grid item xs={12}>
+                    {Status}
                     <CircularProgressWithLabel value={Progress} />
                     {Status === 'converted' ?
                         <Button size="small" variant="contained" color="primary"
@@ -180,7 +243,7 @@ export default function App() {
                         <div>
                         </div>
                     }
-                </Grid>
+                </Grid> */}
             </Container>
         </React.Fragment>
     );

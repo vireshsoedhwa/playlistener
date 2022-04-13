@@ -1,4 +1,5 @@
 # chat/consumers.py
+from cgitb import text
 import json
 from channels.generic.websocket import WebsocketConsumer
 import re
@@ -34,25 +35,29 @@ class ChatConsumer(WebsocketConsumer):
             'status': "submitted"
             }))
 
-        import time
+        print(text_data)
 
-        time.sleep(5)
+        vid = Video.objects.create(url=self.url, urlid=self.urlid)
 
-        self.send(text_data=json.dumps({
-            'status': "wowowo"
-            }))
+        # import time
+
+        # time.sleep(5)
+
+        # self.send(text_data=json.dumps({
+        #     'status': "wowowo"
+        #     }))
         
-        time.sleep(5)
+        # time.sleep(5)
 
-        self.send(text_data=json.dumps({
-            'status': "test"
-            }))
+        # self.send(text_data=json.dumps({
+        #     'status': "test"
+        #     }))
         
-        time.sleep(5)
+        # time.sleep(5)
 
-        self.send(text_data=json.dumps({
-            'status': "anolther test"
-            }))
+        # self.send(text_data=json.dumps({
+        #     'status': "anolther test"
+        #     }))
 
     # async def validate_url(self, url):
     #     x = re.search("(https?://)?(www\.)?youtube\.(com|ca)/watch\?v=([-\w]+)", url)
