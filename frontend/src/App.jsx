@@ -20,13 +20,14 @@ export default function App() {
     const [Connect, setConnect] = useState(false);
     const [Url, setUrl] = useState('');
     const [Status, setStatus] = useState('idle');
-    const [Polling, setPolling] = useState(false);
+    const [Received, setReceived] = useState('');
     const [Progress, setProgress] = useState(0);
+    const [Submitclicked, setSubmitclicked] = useState(false);
 
-    const [Pollingdelay, setPollingdelay] = useState(null);
+    // const [Pollingdelay, setPollingdelay] = useState(null);
     /*
         status list:
-        idle, valid, rejected , downloading , finished, converting
+        idle, valid, rejected , downloading , download_finished, finished, converting
     */
     const ws = useRef(null);
 
@@ -41,24 +42,24 @@ export default function App() {
     //     }
     // }
 
-    useInterval(async () => {
-        console.log("polling")
-        if (!Connect) {
-            makeConnection();
-            console.log("retrying connection");
-        }
-        // setProgress((prevProgress) => (prevProgress >= 100 ? 0 : prevProgress + 10));
-    }, Pollingdelay);
+    // useInterval(async () => {
+    //     console.log("polling")
+    //     if (!Connect) {
+    //         makeConnection();
+    //         console.log("retrying connection");
+    //     }
+    //     // setProgress((prevProgress) => (prevProgress >= 100 ? 0 : prevProgress + 10));
+    // }, Pollingdelay);
 
 
-    useEffect(() => {
-        console.log("initial connection")
-        if (!Connect) {
-            makeConnection();
-            console.log("making connection")
-            setPollingdelay(3000);
-        }
-    }, [Connect]);
+    // useEffect(() => {
+    //     console.log("initial connection")
+    //     if (!Connect) {
+    //         makeConnection();
+    //         console.log("making connection")
+    //         setPollingdelay(3000);
+    //     }
+    // }, [Connect]);
 
     const makeConnection = () => {
         ws.current = new WebSocket(
@@ -75,36 +76,43 @@ export default function App() {
             console.log("ws closed");
             console.error('socket closed unexpectedly ' + e);
             setConnect(false)
-            // setTimeout(function () {
-            // }, 5000);
 
         }
 
         ws.current.onmessage = e => {
             const message = JSON.parse(e.data);
-
             setStatus(message.status)
-            // if (message.status == 'submitted') {
-            //     setPolling(true)
-            // }
-
-            // if (message.status == 'converted') {
-            //     setPolling(false)
-            // }
-
-            // if (message.status == 'downloading') {
-            //     let progress = (message.downloaded_bytes / message.total_bytes) * 100
-            //     setProgress(progress)
-            // }
-            // if (message.status == 'finished' || message.status == 'converted') {
-            //     setProgress(100)
-            // }
-            // if (message.status == 'converted') {
-            //     setProgress(100)
-            // }
-            // console.log("e", e.data);
+            setReceived(message)
         };
     }
+
+    useEffect(() => {
+        console.log("received status")
+        if (Received.status === 'finished') {
+            ws.current.close()
+        }
+
+        if (Received.status === 'submitted') {
+            console.log('submitted')
+            console.log(Status)
+        }
+
+        if (Received.status === 'downloading') {
+            console.log('downloading')
+            // console.log(Status)
+             
+            setProgress( (Received.downloaded_bytes/Received.total_bytes) * 100 )
+        }
+
+        if (Received.status === 'download_finished') {
+            console.log('downloading finished')
+            // console.log(Status)
+            setStatus('download_finished') 
+        }
+
+    }, [Received]);
+
+
 
     // const PostUrl = () => {
     //     const data = { url: Url };
@@ -140,17 +148,24 @@ export default function App() {
     //         });
     // }
 
+    useEffect(() => {
+        console.log("Sending")
+        if (Submitclicked && Connect) {
 
-    // const setStatus = () =>{
 
-    // }
+            ws.current.send(JSON.stringify({
+                'request_type': 'submit',
+                'url': Url
+            }));
+
+            // ws.current.close();
+        }
+    }, [Submitclicked, Connect]);
 
     const Submit = () => {
         // console.log(url)
-        ws.current.send(JSON.stringify({
-            'request_type': 'submit',
-            'url': Url
-        }));
+        setSubmitclicked(true)
+        makeConnection();
     }
 
     // const QueryStatus = () => {
@@ -230,10 +245,16 @@ export default function App() {
 
                 </Grid>
 
-                {/* <Grid item xs={12}>
-                    {Status}
-                    <CircularProgressWithLabel value={Progress} />
-                    {Status === 'converted' ?
+                <Grid item>
+                    {Status === 'downloading' ?
+                        <CircularProgressWithLabel value={Progress} />
+                        :
+                        <div>
+
+                        </div>
+
+                    }
+                    {/* {Status === 'converted' ?
                         <Button size="small" variant="contained" color="primary"
                             onClick={PostUrl}
                         >
@@ -242,30 +263,30 @@ export default function App() {
                         :
                         <div>
                         </div>
-                    }
-                </Grid> */}
+                    } */}
+                </Grid>
             </Container>
         </React.Fragment>
     );
 }
 
-export function useInterval(callback, delay) {
-    const savedCallback = useRef();
-    //Remember the latest callback.
-    useEffect(() => {
-        savedCallback.current = callback;
-    }, [callback]);
+// export function useInterval(callback, delay) {
+//     const savedCallback = useRef();
+//     //Remember the latest callback.
+//     useEffect(() => {
+//         savedCallback.current = callback;
+//     }, [callback]);
 
-    //Set up the interval.
-    useEffect(() => {
-        function tick() {
-            savedCallback.current();
-        }
-        if (delay != null) {
-            const id = setInterval(tick, delay);
-            return () => {
-                clearInterval(id);
-            };
-        }
-    }, [callback, delay]);
-}
+//     //Set up the interval.
+//     useEffect(() => {
+//         function tick() {
+//             savedCallback.current();
+//         }
+//         if (delay != null) {
+//             const id = setInterval(tick, delay);
+//             return () => {
+//                 clearInterval(id);
+//             };
+//         }
+//     }, [callback, delay]);
+// }
