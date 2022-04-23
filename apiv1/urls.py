@@ -8,7 +8,7 @@ urlpatterns = [
     # path('', views.ImageItemListCreate.as_view() ),
     # path('', views.ListAllBThreads.as_view() ),
     path('submitlink', views.submitlink.as_view()),
-    # path('getfile', views.getfile.as_view()),
+    path('getfile/<id>', views.getfile.as_view()),
     # YOUR PATTERNS
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     # Optional UI:

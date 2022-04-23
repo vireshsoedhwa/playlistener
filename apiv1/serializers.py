@@ -10,16 +10,6 @@ from django_q.tasks import async_task, result, fetch
 
 class VideoSerializer(serializers.Serializer):
 
-    def validate_url(self, value):
-        """
-        Check that the blog post is about Django.
-        """
-        x = re.search("(https?://)?(www\.)?youtube\.(com|ca)/watch\?v=([-\w]+)", value)
-        # print(x.group(4))
-        # if 'django' not in value.lower():
-        #     raise serializers.ValidationError("Blog post is not about Django")
-        return x.group(4), value
-
     # id = serializers.CharField(max_length=None, min_length=None, allow_blank=True, trim_whitespace=True)
     url = serializers.URLField(validators=[URLValidator], max_length=200, min_length=None, allow_blank=True)
     # urlid = serializers.SlugField(max_length=200, allow_blank=True, allow_null=True, required=False)
@@ -30,15 +20,15 @@ class VideoSerializer(serializers.Serializer):
 
     def create(self, validated_data):        
         vid = None
-        try:
-            vid = Video.objects.create(url=validated_data["url"][1], urlid=validated_data["url"][0])
-            task_id = async_task('apiv1.task.get_video', vid, sync=False)
-            print("NEW vid created: " + vid.urlid)
-        except:
-            vid = Video.objects.get(urlid=validated_data["url"][0])
-            print("vid exists: " + vid.urlid)
+        # try:
+        #     vid = Video.objects.create(url=validated_data["url"][1], urlid=validated_data["url"][0])
+        #     task_id = async_task('apiv1.task.get_video', vid, sync=False)
+        #     print("NEW vid created: " + vid.urlid)
+        # except:
+        #     vid = Video.objects.get(urlid=validated_data["url"][0])
+        #     print("vid exists: " + vid.urlid)
         
-        return vid
+        # return vid
         
             # task_id = async_task('apiv1.task.get_video', newvid, sync=False)
             # task = fetch(task_id)
