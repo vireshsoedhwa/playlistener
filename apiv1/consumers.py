@@ -7,19 +7,12 @@ from channels.db import database_sync_to_async
 from .models import Video
 from django_q.tasks import async_task, result, fetch
 from .testclass import Testclass
-from .youtube import YT
+from .yt import YT
 
-import time
-# def finished_task(task):
-#     print(task.result.status)
-#     if task.result.status == 'converted':
-#         task.result.ready = True
-#         task.result.save()
-#     else:
-#         task.result.ready = False
-#         task.result.save()
+from django.core.files.base import ContentFile
 
 class ChatConsumer(WebsocketConsumer):
+
     def connect(self):
         self.accept()
         print("connected")
@@ -28,36 +21,47 @@ class ChatConsumer(WebsocketConsumer):
         print("disconnected")
 
     def receive(self, text_data):
+        self.send(text_data=json.dumps({'status': "submitted"}))
 
-        print("ayyyy")
+        text_data_json = json.loads(text_data)
+        text_data_json['url']
 
-        self.send(text_data=json.dumps({
-            'status': "submitted"
-            }))
+        self.Newdownloadprocess = YT(text_data_json['url'], self.progress_hook)
+        self.Newdownloadprocess.run()
 
-        print(text_data)
+    def progress_hook(self, d):
+        if d['status'] == 'downloading':
+            print('Downloadingg it ')
+            # message = str(d['downloaded_bytes']) + "/" + str(d['total_bytes'])
+            self.send(text_data=json.dumps(
+                {
+                    'status': 'downloading',
+                    'total_bytes': str(d['total_bytes']),
+                    'downloaded_bytes': str(d['downloaded_bytes'])
+                }))
+        if d['status'] == 'error':
+            print('Error happened')
+            self.send(text_data=json.dumps(
+                {
+                    'status': 'error'
+                }))
+        if d['status'] == 'finished':
+            self.send(text_data=json.dumps(
+                {
+                    'status': 'download_finished'
+                }))
+            print(self.Newdownloadprocess.url)
+            print(d['filename'])
 
-        vid = Video.objects.create(url=self.url, urlid=self.urlid)
+            get_just_filename = re.search("(.*/)([^\/]*)\.[a-zA-Z]*$", d['filename'])
 
-        # import time
+            vid = Video.objects.create(id=self.Newdownloadprocess.url)
+            vid.download_finished = True
+            vid.title = get_just_filename.group(2)
+            vid.original_audiofile.name = get_just_filename.group(1) + get_just_filename.group(2) + ".mp3"
+            vid.save()
 
-        # time.sleep(5)
-
-        # self.send(text_data=json.dumps({
-        #     'status': "wowowo"
-        #     }))
-        
-        # time.sleep(5)
-
-        # self.send(text_data=json.dumps({
-        #     'status': "test"
-        #     }))
-        
-        # time.sleep(5)
-
-        # self.send(text_data=json.dumps({
-        #     'status': "anolther test"
-        #     }))
+            print('download finished converting now')
 
     # async def validate_url(self, url):
     #     x = re.search("(https?://)?(www\.)?youtube\.(com|ca)/watch\?v=([-\w]+)", url)
@@ -76,7 +80,7 @@ class ChatConsumer(WebsocketConsumer):
     #         # return x.group(4)
     #         return True
 
-    # def get_vid(self):        
+    # def get_vid(self):
     #     try:
     #         print("database check")
     #         vid = Video.objects.get(urlid=self.urlid)
@@ -96,9 +100,7 @@ class ChatConsumer(WebsocketConsumer):
     #         print("NEW vid created: " + vid.urlid)
     #         return vid
 
-
-
-    # def polling(self):        
+    # def polling(self):
     #     try:
     #         vid = Video.objects.get(urlid=self.urlid)
     #         print("vid found")
@@ -116,16 +118,16 @@ class ChatConsumer(WebsocketConsumer):
     #         print("dsfgdsf")
 
     #     if text_data_json['request_type'] == "submit":
-    #         print ("submission command")           
-    #         vid = await database_sync_to_async(self.get_vid)() 
+    #         print ("submission command")
+    #         vid = await database_sync_to_async(self.get_vid)()
     #         # print("getvid")
     #         await self.send(text_data=json.dumps({
     #         'status': "submitted"
     #         }))
 
     #     elif text_data_json['request_type'] == "polling":
-    #         print ("POLLING")     
-    #         vid = await database_sync_to_async(self.get_vid)()     
+    #         print ("POLLING")
+    #         vid = await database_sync_to_async(self.get_vid)()
 
     #         if vid:
     #             await self.send(text_data=json.dumps({
@@ -151,5 +153,3 @@ class ChatConsumer(WebsocketConsumer):
 
     # async def disconnect(self, message):
     #     pass
-
-

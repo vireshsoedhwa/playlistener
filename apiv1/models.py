@@ -6,53 +6,37 @@ from django.dispatch import receiver
 
 import re
 
-# Create your models here.
-
-# def validate_url(url):
-#     try:
-#         URLValidator(url)
-#     except ValidationError:
-#         return False
-#     return True
-
 def file_directory_path(instance, filename):
-    return '/code/dl/{0}/{1}'.format(instance.urlid, instance.filename)
+    return '/code/dl/{0}/{1}'.format(instance.id, instance.filename)
 
 
 def my_callback(sender, **kwargs):
-    print("Request finished!dsaffffffff")
+    print("")
+
 
 class Video(models.Model):
-    id = models.AutoField(primary_key=True)
-    url = models.URLField(max_length=200, null=True, blank=True)
-    urlid = models.TextField(max_length=200, null=True, blank=True)
-    filename = models.TextField(max_length=200, null=True, blank=True)
-    ready = models.BooleanField(null=True, blank=True, default=False)
-    downloaded_bytes = models.TextField(max_length=200,null=True,blank=True)
-    total_bytes = models.TextField(max_length=200,null=True,blank=True)
-    status = models.TextField(max_length=200, null=True,blank=True)
-    audiofile = models.FileField(upload_to=file_directory_path, null=True, blank=True)
+    id = models.TextField(primary_key=True, max_length=200, blank=True)
+    title = models.TextField(max_length=200, null=True, blank=True)
+    download_finished = models.BooleanField(null=True,
+                                            blank=True,
+                                            default=False)
+    audiofile_converted = models.BooleanField(null=True, blank=True, default=False)
+    status = models.TextField(max_length=200, null=True, blank=True)
+    original_audiofile = models.FileField(upload_to=file_directory_path,
+                                 null=True,
+                                 blank=True)
+    converted_audiofile = models.FileField(upload_to=file_directory_path,
+                                 null=True,
+                                 blank=True)
+
     # videofile = models.FileField(upload_to=file_directory_path, null=True, blank=True)
-    # state = models.DecimalField(decimal_places=0, max_digits=2, null=True, blank=True)
     # created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        constraints = [
-        UniqueConstraint(fields=['urlid'], name="vid-id")
-        ]
-
-    def create_urlid(self, **kwargs):
-        # instance
-        x = re.search("(https?://)?(www\.)?youtube\.(com|ca)/watch\?v=([-\w]+)", self.url)
-        # print(x.group(4))
-        self.urlid = x.group(4)
-        self.save()
-        # self.urlid = x
-        
+        constraints = [UniqueConstraint(fields=['id'], name="vid-id")]
 
     def __str__(self):
         return str(self.id)
-
 
 
 # class TransactionDetail(models.Model):
