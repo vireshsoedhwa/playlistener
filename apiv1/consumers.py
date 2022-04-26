@@ -9,6 +9,8 @@ from django_q.tasks import async_task, result, fetch
 from .testclass import Testclass
 from .yt import YT
 
+import time
+
 from django.core.files.base import ContentFile
 
 class ChatConsumer(WebsocketConsumer):
@@ -26,8 +28,12 @@ class ChatConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         text_data_json['url']
 
-        self.Newdownloadprocess = YT(text_data_json['url'], self.progress_hook)
-        self.Newdownloadprocess.run()
+        print("sleep")
+
+        time.sleep(20)
+
+        # self.Newdownloadprocess = YT(text_data_json['url'], self.progress_hook)
+        # self.Newdownloadprocess.run()
 
     def progress_hook(self, d):
         if d['status'] == 'downloading':
