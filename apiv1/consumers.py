@@ -13,6 +13,7 @@ import time
 
 from django.core.files.base import ContentFile
 
+
 class ChatConsumer(WebsocketConsumer):
 
     def connect(self):
@@ -27,15 +28,20 @@ class ChatConsumer(WebsocketConsumer):
 
         text_data_json = json.loads(text_data)
         text_data_json['url']
+        
+        if Video.objects.filter(id=text_data_json['url']).exists():
+            print("video already exists")    
 
-        print("sleep")
 
-        time.sleep(20)
+        else:
+            self.Newdownloadprocess = YT(text_data_json['url'], self.progress_hook)
+            self.Newdownloadprocess.run()
+        
 
-        # self.Newdownloadprocess = YT(text_data_json['url'], self.progress_hook)
-        # self.Newdownloadprocess.run()
+        print("check check check")
 
     def progress_hook(self, d):
+        print(d['status'])
         if d['status'] == 'downloading':
             print('Downloadingg it ')
             # message = str(d['downloaded_bytes']) + "/" + str(d['total_bytes'])
@@ -47,25 +53,23 @@ class ChatConsumer(WebsocketConsumer):
                 }))
         if d['status'] == 'error':
             print('Error happened')
-            self.send(text_data=json.dumps(
-                {
-                    'status': 'error'
-                }))
+            self.send(text_data=json.dumps({'status': 'error'}))
         if d['status'] == 'finished':
-            self.send(text_data=json.dumps(
-                {
-                    'status': 'download_finished'
-                }))
+            self.send(text_data=json.dumps({'status': 'download_finished'}))
             print(self.Newdownloadprocess.url)
             print(d['filename'])
 
-            get_just_filename = re.search("(.*/)([^\/]*)\.[a-zA-Z]*$", d['filename'])
-
+            get_just_filename = re.search(r"(.*\/)([^\/]*)\.[a-zA-Z]*",
+                                          d['filename'])
+            
             vid = Video.objects.create(id=self.Newdownloadprocess.url)
             vid.download_finished = True
             vid.title = get_just_filename.group(2)
-            vid.original_audiofile.name = get_just_filename.group(1) + get_just_filename.group(2) + ".mp3"
+            vid.original_audiofile.name = get_just_filename.group(
+                1) + get_just_filename.group(2) + ".mp3"
             vid.save()
+            
+            
 
             print('download finished converting now')
 

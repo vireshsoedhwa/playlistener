@@ -9,13 +9,13 @@ module.exports = merge(common, {
     //     contentBase: './dist',
     //   },
     plugins: [
-        new BrowserSyncPlugin({
-            // browse to http://localhost:3000/ during development,
-            // ./public directory is being served
-            host: 'localhost',
-            port: 9000,
-            proxy: 'http://localhost:8000/',
-        },
+        // new BrowserSyncPlugin({
+        //     // browse to http://localhost:3000/ during development,
+        //     // ./public directory is being served
+        //     host: 'localhost',
+        //     port: 9000,
+        //     proxy: 'http://localhost:8000/',
+        // },
             // // plugin options
             // {
             //     // prevent BrowserSync from reloading the page

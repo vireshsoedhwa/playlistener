@@ -26,7 +26,10 @@ SECRET_KEY = 'm925%@rztqnd=%6l9neo!h2w=ro_iaw-uryy!jlsdvrmnl-qie'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS=['http://localhost:9000']
 
+CSRF_USE_SESSIONS = True
+CSRF_COOKIE_HTTPONLY = True
 
 # Application definition
 

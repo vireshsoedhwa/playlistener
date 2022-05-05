@@ -69,6 +69,7 @@ class getfile(APIView):
         try:
             vid = Video.objects.get(id=id)
         
+            print("ayooo")
             print(vid)
             print(vid.original_audiofile.path)
 
