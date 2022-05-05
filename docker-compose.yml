@@ -17,15 +17,20 @@ services:
   #         - app-network
   app:
     build: .
-    # command: python manage.py runserver 0.0.0.0:8000
-    command: supervisord -c supervisord.conf -n
+    # command: python manage.py runserver 0.0.0.0:8001 
+    # command: supervisord -c supervisord.conf -n
+    # command: >
+    #   sh -c "(cd /code/frontend && npm install)
+    #   && (cd /code/frontend && npm run watch&)
+    #   && python manage.py runserver 0.0.0.0:9000"
+
     image: playlistener
     # restart: unless-stopped
     # tty: true
     volumes:
       - .:/code
     ports:
-      - "8000:8000"
+      - "9000:9000"
     # depends_on:
     #   - redis
     # working_dir: /code
