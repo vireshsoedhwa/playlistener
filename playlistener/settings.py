@@ -34,7 +34,8 @@ CSRF_COOKIE_HTTPONLY = True
 # Application definition
 
 INSTALLED_APPS = [
-    'chat',
+    'frontend',
+    'apiv1',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,8 +45,6 @@ INSTALLED_APPS = [
     
     'corsheaders',
     'rest_framework',
-    'frontend.apps.FrontendConfig',
-    'apiv1.apps.Apiv1Config',
     'django_q',
     'drf_spectacular',
     'channels',

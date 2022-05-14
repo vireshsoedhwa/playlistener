@@ -30,8 +30,8 @@ echo "--------------------------------------------------------------------------
 # tail -f /dev/null
 
 #Start NGINX
->&2 echo "Starting nginx..."
-nginx
+# >&2 echo "Starting nginx..."
+# nginx
 
 # Start Django dev server
 >&2 echo "Starting Django runserver..."

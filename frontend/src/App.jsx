@@ -229,7 +229,7 @@ export default function App() {
                         </h2>
                         :
                         <h2>
-                            DIsconnecteed
+                            DIsconnecteed 
                         </h2>
                     }
                     {Status}
