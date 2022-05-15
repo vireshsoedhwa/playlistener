@@ -14,7 +14,7 @@ import time
 from django.core.files.base import ContentFile
 
 
-class ChatConsumer(WebsocketConsumer):
+class DownloadConsumer(WebsocketConsumer):
 
     def connect(self):
         self.accept()

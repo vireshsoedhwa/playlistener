@@ -21,7 +21,7 @@ services:
     # command: supervisord -c supervisord.conf -n
     command: >
       sh -c "(cd /code/frontend && npm install)
-      && (cd /code/frontend && npm run watch&)
+      && (cd /code/frontend && npm run build)
       && python manage.py runserver 0.0.0.0:9000"
 
     image: playlistener

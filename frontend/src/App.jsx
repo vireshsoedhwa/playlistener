@@ -98,15 +98,13 @@ export default function App() {
         }
 
         if (Received.status === 'downloading') {
-            console.log('downloading')
-            // console.log(Status)
-             
+            console.log('downloading')       
             setProgress( (Received.downloaded_bytes/Received.total_bytes) * 100 )
         }
 
         if (Received.status === 'download_finished') {
             console.log('downloading finished')
-            // console.log(Status)
+            ws.current.close();
             setStatus('download_finished') 
         }
 
@@ -229,7 +227,7 @@ export default function App() {
                         </h2>
                         :
                         <h2>
-                            DIsconnecteed 
+                            DIsconnecteed
                         </h2>
                     }
                     {Status}
