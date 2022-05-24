@@ -35,7 +35,79 @@ export default function UrlSubmit(props) {
     const [InputErrorMsg, setInputErrorMsg] = useState('')
     const [Valid, setValid] = useState(false)
     const [Url, setUrl] = useState('')
-    const [Progress, setProgress] = useState(100)
+    const [Progress, setProgress] = useState(0)
+
+    const [Connect, setConnect] = useState(false);
+    const [Status, setStatus] = useState('idle');
+    const [Received, setReceived] = useState('');
+    const [Submitclicked, setSubmitclicked] = useState(false);
+    const [Mode, setMode] = useState(0)
+
+    const ws = useRef(null);
+
+    const makeConnection = () => {
+        ws.current = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/'
+        );
+
+        ws.current.onopen = () => {
+            console.log("ws opened");
+            setConnect(true)
+        }
+        ws.current.onclose = (e) => {
+            console.log("ws closed");
+            console.error('socket closed unexpectedly ' + e);
+            setConnect(false)
+        }
+
+        ws.current.onmessage = e => {
+            const message = JSON.parse(e.data);
+            setStatus(message.status)
+            setReceived(message)
+        };
+    }
+
+    useEffect(() => {
+        if (Received.status === 'finished') {
+            ws.current.close()
+        }
+
+        if (Received.status === 'submitted') {
+            console.log('submitted')
+            console.log(Status)
+        }
+
+        if (Received.status === 'downloading') {
+            console.log('downloading')
+            setProgress((Received.downloaded_bytes / Received.total_bytes) * 100)
+        }
+
+        if (Received.status === 'download_finished') {
+            console.log('downloading finished')
+            ws.current.close();
+            setStatus('download_finished')
+        }
+
+    }, [Received]);
+
+    useEffect(() => {
+        if (Submitclicked && Connect) {
+            console.log("Sending")
+            ws.current.send(JSON.stringify({
+                'request_type': 'submit',
+                'url': Url
+            }));
+            // ws.current.close();
+        }
+    }, [Submitclicked, Connect]);
+
+    const Submit = () => {
+        // console.log(url)
+        setSubmitclicked(true)
+        makeConnection();
+    }
 
     const ChangeURL = (value) => {
         var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -58,15 +130,6 @@ export default function UrlSubmit(props) {
             setDisableDownload(true)
         }
     }
-
-    const imgstyle = {
-        // position: 'relative',
-        // objectfit: 'contain',
-        // width: '200px',
-        // height: 'auto',
-        // margin: '0',
-        // border: 'solid 1px #CCC'
-    };
 
     const imgcontainer = {
         width: 'auto',
@@ -160,13 +223,23 @@ export default function UrlSubmit(props) {
                                     </Grid>
 
                                     <Grid item xs={6}>
-                                        Progress
-                                        {/* <CircularProgressWithLabel value={Progress} /> */}
-                                        <LinearProgressWithLabel value={Progress} />
 
-                                        <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}>
-                                            <Button variant="contained">Submit</Button>
-                                        </Box>
+                                        {/* <CircularProgressWithLabel value={Progress} /> */}
+                                        {Valid ?
+                                            <>
+                                                Download Progress
+                                                <LinearProgressWithLabel value={Progress} />
+                                                <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}>
+                                                    <Button
+                                                        variant="contained"
+                                                        onClick={Submit}
+                                                    >Submit</Button>
+                                                </Box>
+                                            </>
+                                            :
+                                            <div>
+                                            </div>
+                                        }
                                     </Grid>
 
 

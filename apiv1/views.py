@@ -7,9 +7,9 @@ from django.core.files import File
 from rest_framework.renderers import JSONRenderer
 
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
-from .serializers import VideoSerializer
+from .serializers import ResourceSerializer
 
-from .models import Video
+from .models import Resource
 
 import requests
 import logging
@@ -19,14 +19,14 @@ logger = logging.getLogger(__name__)
 
 # Create your views here.
 class submitlink(APIView):
-    serializer_class = VideoSerializer
+    serializer_class = ResourceSerializer
 
-    @extend_schema(request=VideoSerializer)
+    @extend_schema(request=ResourceSerializer)
     def post(self, request, format=None):
         data = request.data['url']
         # thevid = Video.objects.get(id=38)
         # print(data)
-        serializer = VideoSerializer(data={'url': data})
+        serializer = ResourceSerializer(data={'url': data})
         if serializer.is_valid():
             # serializer.errors
             video = serializer.save()
@@ -67,7 +67,7 @@ class getfile(APIView):
 
         # vid = Video.objects.create(id=self.Newdownloadprocess.url)
         try:
-            vid = Video.objects.get(id=id)
+            vid = Resource.objects.get(id=id)
         
             print("ayooo")
             print(vid)

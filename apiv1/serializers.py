@@ -1,21 +1,21 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from django.core.validators import URLValidator
-from .models import Video
+from .models import Resource
 from django.db import IntegrityError
 import re
 
 from django_q.tasks import async_task, result, fetch
 
 
-class VideoSerializer(serializers.Serializer):
+class ResourceSerializer(serializers.Serializer):
 
     # id = serializers.CharField(max_length=None, min_length=None, allow_blank=True, trim_whitespace=True)
     url = serializers.URLField(validators=[URLValidator], max_length=200, min_length=None, allow_blank=True)
     # urlid = serializers.SlugField(max_length=200, allow_blank=True, allow_null=True, required=False)
 
     class Meta:
-        model = Video
+        model = Resource
         fields = ('id', 'url')
 
     def create(self, validated_data):        

@@ -4,7 +4,7 @@ import json
 from channels.generic.websocket import WebsocketConsumer
 import re
 from channels.db import database_sync_to_async
-from .models import Video
+from .models import Resource
 from django_q.tasks import async_task, result, fetch
 from .testclass import Testclass
 from .yt import YT
@@ -29,7 +29,7 @@ class DownloadConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         text_data_json['url']
         
-        if Video.objects.filter(id=text_data_json['url']).exists():
+        if Resource.objects.filter(id=text_data_json['url']).exists():
             print("video already exists")    
 
         else:
@@ -58,7 +58,7 @@ class DownloadConsumer(WebsocketConsumer):
             get_just_filename = re.search(r"(.*\/)([^\/]*)\.[a-zA-Z0-9]*",
                                           d['filename'])
             
-            vid = Video.objects.create(id=self.Newdownloadprocess.url)
+            vid = Resource.objects.create(id=self.Newdownloadprocess.url)
             vid.download_finished = True
             vid.title = get_just_filename.group(2)
             vid.original_videofile.name = d['filename']

@@ -1,6 +1,6 @@
 import youtube_dl
 
-from .models import Video
+from .models import Resource
 
 
 class YT:

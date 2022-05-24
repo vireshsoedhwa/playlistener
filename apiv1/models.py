@@ -15,7 +15,7 @@ def my_callback(sender, **kwargs):
     print("")
 
 
-class Video(models.Model):
+class Resource(models.Model):
     id = models.TextField(primary_key=True, max_length=200, blank=True)
     title = models.TextField(max_length=200, null=True, blank=True)
     download_finished = models.BooleanField(null=True,

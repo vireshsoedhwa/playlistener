@@ -1,5 +1,5 @@
 import youtube_dl 
-from .models import Video
+from .models import Resource
 from django.core.files.base import ContentFile
 from django.core.files import File
 

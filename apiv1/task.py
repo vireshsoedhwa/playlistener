@@ -1,6 +1,6 @@
 # import youtube_dl 
 import time
-from .models import Video
+from .models import Resource
 from django.core.files.base import ContentFile
 from django.core.files import File
 

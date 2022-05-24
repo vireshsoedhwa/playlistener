@@ -38,7 +38,7 @@ export default function App() {
         status list:
         idle, valid, rejected , downloading , download_finished, finished, converting
     */
-    const ws = useRef(null);
+    // const ws = useRef(null);
 
     // const getId(url) {
     //     var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -70,53 +70,53 @@ export default function App() {
     //     }
     // }, [Connect]);
 
-    const makeConnection = () => {
-        ws.current = new WebSocket(
-            'ws://'
-            + window.location.host
-            + '/ws/'
-        );
+    // const makeConnection = () => {
+    //     ws.current = new WebSocket(
+    //         'ws://'
+    //         + window.location.host
+    //         + '/ws/'
+    //     );
 
-        ws.current.onopen = () => {
-            console.log("ws opened");
-            setConnect(true)
-        }
-        ws.current.onclose = (e) => {
-            console.log("ws closed");
-            console.error('socket closed unexpectedly ' + e);
-            setConnect(false)
+    //     ws.current.onopen = () => {
+    //         console.log("ws opened");
+    //         setConnect(true)
+    //     }
+    //     ws.current.onclose = (e) => {
+    //         console.log("ws closed");
+    //         console.error('socket closed unexpectedly ' + e);
+    //         setConnect(false)
 
-        }
+    //     }
 
-        ws.current.onmessage = e => {
-            const message = JSON.parse(e.data);
-            setStatus(message.status)
-            setReceived(message)
-        };
-    }
+    //     ws.current.onmessage = e => {
+    //         const message = JSON.parse(e.data);
+    //         setStatus(message.status)
+    //         setReceived(message)
+    //     };
+    // }
 
-    useEffect(() => {
-        if (Received.status === 'finished') {
-            ws.current.close()
-        }
+    // useEffect(() => {
+    //     if (Received.status === 'finished') {
+    //         ws.current.close()
+    //     }
 
-        if (Received.status === 'submitted') {
-            console.log('submitted')
-            console.log(Status)
-        }
+    //     if (Received.status === 'submitted') {
+    //         console.log('submitted')
+    //         console.log(Status)
+    //     }
 
-        if (Received.status === 'downloading') {
-            console.log('downloading')
-            setProgress((Received.downloaded_bytes / Received.total_bytes) * 100)
-        }
+    //     if (Received.status === 'downloading') {
+    //         console.log('downloading')
+    //         setProgress((Received.downloaded_bytes / Received.total_bytes) * 100)
+    //     }
 
-        if (Received.status === 'download_finished') {
-            console.log('downloading finished')
-            ws.current.close();
-            setStatus('download_finished')
-        }
+    //     if (Received.status === 'download_finished') {
+    //         console.log('downloading finished')
+    //         ws.current.close();
+    //         setStatus('download_finished')
+    //     }
 
-    }, [Received]);
+    // }, [Received]);
 
 
 
@@ -154,22 +154,22 @@ export default function App() {
     //         });
     // }
 
-    useEffect(() => {
-        if (Submitclicked && Connect) {
-            console.log("Sending")
-            ws.current.send(JSON.stringify({
-                'request_type': 'submit',
-                'url': Url
-            }));
-            // ws.current.close();
-        }
-    }, [Submitclicked, Connect]);
+    // useEffect(() => {
+    //     if (Submitclicked && Connect) {
+    //         console.log("Sending")
+    //         ws.current.send(JSON.stringify({
+    //             'request_type': 'submit',
+    //             'url': Url
+    //         }));
+    //         // ws.current.close();
+    //     }
+    // }, [Submitclicked, Connect]);
 
-    const Submit = () => {
-        // console.log(url)
-        setSubmitclicked(true)
-        makeConnection();
-    }
+    // const Submit = () => {
+    //     // console.log(url)
+    //     setSubmitclicked(true)
+    //     makeConnection();
+    // }
 
     // const QueryStatus = () => {
     //     ws.current.send(JSON.stringify({
@@ -177,13 +177,6 @@ export default function App() {
     //         'url': Url
     //     }));
     // }
-
-    const inputbox = {
-        // width: '100%',
-        // height: 'auto',
-        // border: 'solid 1px #CCC',
-        // backgroundColor: '#edf8ff'
-    }
 
     return (
         <React.Fragment>
