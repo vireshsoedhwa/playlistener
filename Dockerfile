@@ -39,7 +39,6 @@
 # RUN npm install
 # RUN npm run build
 
-
 # ==========================================================================================================================
 # Release
 FROM python:3.10-slim-buster
@@ -58,6 +57,7 @@ RUN set -ex; \
             curl \
             ffmpeg \
             gcc \
+            nginx \
             npm \
         ; \
         \
@@ -75,12 +75,21 @@ RUN mkdir -p /run/daphne
 COPY manage.py supervisord.conf ./
 COPY docker-entrypoint.sh /usr/local/bin
 
-# COPY /nginx/nginx.conf /etc/nginx/nginx.conf
-# COPY frontend/src frontend/src
+COPY /nginx/nginx.conf /etc/nginx/nginx.conf
+COPY frontend frontend
+COPY playlistener playlistener
+COPY apiv1 apiv1
+
+WORKDIR /code/frontend
+
+RUN npm install
+RUN npm run build
+
+WORKDIR /code
+EXPOSE 9000
 
 ENTRYPOINT ["docker-entrypoint.sh"]
-
-EXPOSE 9000
 CMD ["supervisord", "-c", "supervisord.conf", "-n"]
+
 
 

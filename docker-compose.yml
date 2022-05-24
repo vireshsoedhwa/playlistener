@@ -16,15 +16,19 @@ services:
   #   networks:
   #         - app-network
   app:
-    build: .
+    image: playlistener
+    build: 
+      context: .
+
     # command: python manage.py runserver 0.0.0.0:8001 
     # command: supervisord -c supervisord.conf -n
           # && (cd /code/frontend && npm run build)
     command: >
       sh -c "(cd /code/frontend && npm install)
-      && python manage.py runserver 0.0.0.0:9000"
+      && supervisord -c supervisord.conf -n"
+      
+     # && python manage.py runserver 0.0.0.0:9000"
 
-    image: playlistener
     # restart: unless-stopped
     # tty: true
     volumes:
