@@ -6,6 +6,7 @@ from django.dispatch import receiver
 
 import re
 
+
 def file_directory_path(instance, filename):
     return '/code/dl/{0}/{1}'.format(instance.id, instance.filename)
 
@@ -20,14 +21,19 @@ class Video(models.Model):
     download_finished = models.BooleanField(null=True,
                                             blank=True,
                                             default=False)
-    audiofile_converted = models.BooleanField(null=True, blank=True, default=False)
+    audiofile_converted = models.BooleanField(null=True,
+                                              blank=True,
+                                              default=False)
     status = models.TextField(max_length=200, null=True, blank=True)
+    original_videofile = models.FileField(upload_to=file_directory_path,
+                                          null=True,
+                                          blank=True)
     original_audiofile = models.FileField(upload_to=file_directory_path,
-                                 null=True,
-                                 blank=True)
+                                          null=True,
+                                          blank=True)
     converted_audiofile = models.FileField(upload_to=file_directory_path,
-                                 null=True,
-                                 blank=True)
+                                           null=True,
+                                           blank=True)
 
     # videofile = models.FileField(upload_to=file_directory_path, null=True, blank=True)
     # created_at = models.DateTimeField(auto_now_add=True)

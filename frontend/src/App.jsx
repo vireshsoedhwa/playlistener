@@ -1,9 +1,15 @@
 import React, { Fragment, useEffect, useState, useRef } from 'react';
-// import { makeStyles } from '@material-ui/core/styles';
+
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import styles from './css/app.module.css';
 
 // import List from '@material-ui/core/List';
 // import ListItem from '@material-ui/core/ListItem';
@@ -11,9 +17,11 @@ import Button from '@mui/material/Button';
 
 import CircularProgressWithLabel from './CircularStatic';
 
-import InputField from './InputField';
+// import InputField from './InputField';
 import SubmitButton from './SubmitButton';
-
+import Chooser from './Chooser';
+import FileSubmit from './FileSubmit';
+import UrlSubmit from './UrlSubmit';
 
 
 export default function App() {
@@ -23,6 +31,7 @@ export default function App() {
     const [Received, setReceived] = useState('');
     const [Progress, setProgress] = useState(0);
     const [Submitclicked, setSubmitclicked] = useState(false);
+    const [Mode, setMode] = useState(0)
 
     // const [Pollingdelay, setPollingdelay] = useState(null);
     /*
@@ -87,7 +96,6 @@ export default function App() {
     }
 
     useEffect(() => {
-        console.log("received status")
         if (Received.status === 'finished') {
             ws.current.close()
         }
@@ -98,14 +106,14 @@ export default function App() {
         }
 
         if (Received.status === 'downloading') {
-            console.log('downloading')       
-            setProgress( (Received.downloaded_bytes/Received.total_bytes) * 100 )
+            console.log('downloading')
+            setProgress((Received.downloaded_bytes / Received.total_bytes) * 100)
         }
 
         if (Received.status === 'download_finished') {
             console.log('downloading finished')
             ws.current.close();
-            setStatus('download_finished') 
+            setStatus('download_finished')
         }
 
     }, [Received]);
@@ -147,15 +155,12 @@ export default function App() {
     // }
 
     useEffect(() => {
-        console.log("Sending")
         if (Submitclicked && Connect) {
-
-
+            console.log("Sending")
             ws.current.send(JSON.stringify({
                 'request_type': 'submit',
                 'url': Url
             }));
-
             // ws.current.close();
         }
     }, [Submitclicked, Connect]);
@@ -173,96 +178,81 @@ export default function App() {
     //     }));
     // }
 
-    const imgstyle = {
-        objectfit: 'contain',
-        width: '300px',
-        height: 'auto',
-        border: 'solid 1px #CCC'
-    };
+    const inputbox = {
+        // width: '100%',
+        // height: 'auto',
+        // border: 'solid 1px #CCC',
+        // backgroundColor: '#edf8ff'
+    }
 
     return (
         <React.Fragment>
-            <Container maxWidth="sm">
-                <Grid item >
-                    {/* <form noValidate autoComplete="off"> */}
-                    {/* <TextField id="standard-basic" label="Standard" onChange={ChangeURL} /> */}
+            <Container fixed>
+                {/* <Stack spacing={2}> */}
+                <Grid item xs container direction="column"
+                    justifyContent="space-around"
+                    alignItems="stretch"
+                >
+                    <Grid item xs>
+                        <Chooser setmode={setMode} />
+                    </Grid>
+                    <Grid item>
+                        {Mode == 1 ?
+                            <FileSubmit></FileSubmit>
+                            :
+                            <UrlSubmit />
+                        }
+                    </Grid>
+                    <Grid item xs>
 
-                    <InputField seturl={setUrl} connect={Connect} setstatus={setStatus} />
+                        list of RESULTs
 
-
-                    {/* <Button size="small" variant="contained" color="primary"
-                            onClick={SubmitUrl}
-                        >
-                            Submit
-                        </Button> */}
-                    {/* </form> */}
+                    </Grid>
                 </Grid>
-                <Grid item >
-                    {(Status === 'idle' || Status === 'rejected') ?
-                        <div>
+                {/* </Stack> */}
+                {/* <InputField seturl={setUrl} connect={Connect} setstatus={setStatus} />
+                {(Status === 'idle' || Status === 'rejected') ?
+                    <div>
 
-                        </div>
-                        :
-                        <div>
-                            <div>
-                                <img src={"//img.youtube.com/vi/" + Url + "/sddefault.jpg"} alt="youtube thumbnail" style={imgstyle} />
-                            </div>
-                        </div>
-                    }
-
-                    {Status === 'valid' ?
-                        <div>
-                            <SubmitButton submit={Submit} />
-                        </div>
-                        :
-                        <div>
-
-                        </div>
-                    }
-                </Grid>
-                <Grid item >
-                    {Connect ?
-                        <h2>
-                            Connected
-                        </h2>
-                        :
-                        <h2>
-                            DIsconnecteed
-                        </h2>
-                    }
-                    {Status}
-                </Grid>
-                <Grid item >
-
-
-                    {/* {Status === 'valid' ?
-                        <SubmitButton />
+                    </div>
                     :
-                    <div></div>                
-                    } */}
-
-                </Grid>
-
-                <Grid item>
-                    {Status === 'downloading' ?
-                        <CircularProgressWithLabel value={Progress} />
-                        :
+                    <div>
                         <div>
-
+                            <img src={"//img.youtube.com/vi/" + Url + "/sddefault.jpg"} alt="youtube thumbnail" style={imgstyle} />
                         </div>
+                    </div>
+                }
 
-                    }
-                    {/* {Status === 'converted' ?
-                        <Button size="small" variant="contained" color="primary"
-                            onClick={PostUrl}
-                        >
-                            Download
-                        </Button>
-                        :
-                        <div>
-                        </div>
-                    } */}
-                </Grid>
+                {Status === 'valid' ?
+                    <div>
+                        <SubmitButton submit={Submit} />
+                    </div>
+                    :
+                    <div>
+
+                    </div>
+                }
+
+                {Connect ?
+                    <h2>
+                        Connected
+                    </h2>
+                    :
+                    <h2>
+                        DIsconnecteed
+                    </h2>
+                }
+                {Status}
+
+                {Status === 'downloading' ?
+                    <CircularProgressWithLabel value={Progress} />
+                    :
+                    <div>
+
+                    </div>
+                } */}
+
+
             </Container>
         </React.Fragment>
     );

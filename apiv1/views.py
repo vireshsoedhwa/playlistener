@@ -79,3 +79,19 @@ class getfile(APIView):
             return file_response
         except:
             return JsonResponse({'foo': 'bar'}, status=404)
+
+# class getvideo(APIView):
+#     def get(self, request, id, format=None):
+#         try:
+#             vid = Video.objects.get(id=id)
+        
+#             print("ayooo")
+#             print(vid)
+#             print(vid.original_videofile.path)
+
+#             file_response = FileResponse(vid.original_videofile)
+#             file_response[
+#                 'Content-Disposition'] = 'attachment; filename="' + vid.title + 'mp3"'
+#             return file_response
+#         except:
+#             return JsonResponse({'foo': 'bar'}, status=404)

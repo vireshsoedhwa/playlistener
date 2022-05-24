@@ -20,7 +20,7 @@ class YT:
             MyLogger(),
             'progress_hooks': [progresshook],
             'download_archive': '/code/dl/archive',
-            'keepvideo': False,
+            'keepvideo': True,
             # 'skip_download': True,
             'cachedir': '/code/dl/cache',
             'outtmpl': '/code/dl/' + url + '/' + '%(title)s.%(ext)s',
