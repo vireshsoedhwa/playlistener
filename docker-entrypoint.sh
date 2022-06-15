@@ -3,7 +3,7 @@
 set -e
 
 >&2 echo "Make Database migrations"
-python manage.py makemigrations apiv1
+python manage.py makemigrations frontend
 echo "-------------------------------------------------------------------------------------------\n"
 
 
@@ -16,9 +16,9 @@ echo "--------------------------------------------------------------------------
 python manage.py collectstatic --noinput
 
 
-# >&2 echo "Start Django Q task Scheduler"
-# python manage.py qcluster &
-# echo "-------------------------------------------------------------------------------------------\n"
+>&2 echo "Start Django Q task Scheduler"
+python manage.py qcluster &
+echo "-------------------------------------------------------------------------------------------\n"
 
 
 >&2 echo "Create temporary superuser"

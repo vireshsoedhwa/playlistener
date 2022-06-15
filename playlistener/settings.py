@@ -35,7 +35,6 @@ CSRF_COOKIE_HTTPONLY = True
 
 INSTALLED_APPS = [
     'frontend',
-    'apiv1',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -78,7 +77,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'playlistener.wsgi.application'
+# WSGI_APPLICATION = 'playlistener.wsgi.application'
 ASGI_APPLICATION = "playlistener.asgi.application"
 
 CHANNEL_LAYERS = {

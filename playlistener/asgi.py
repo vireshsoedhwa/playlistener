@@ -18,13 +18,13 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'playlistener.settings')
 
 django_asgi_app = get_asgi_application()
 
-import apiv1.routing
+import frontend.routing
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,
     "websocket": AuthMiddlewareStack(
         URLRouter(
-            apiv1.routing.websocket_urlpatterns
+            frontend.routing.websocket_urlpatterns
         )
     ),
     # Just HTTP for now. (We can add other protocols later.)

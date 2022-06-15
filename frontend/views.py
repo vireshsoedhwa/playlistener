@@ -5,4 +5,14 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 @ensure_csrf_cookie
 def index(request):
-    return render(request, 'frontend/index.html')
+
+    if request.session.test_cookie_worked():
+        print(str(request.headers['Cookie']))
+
+    request.session.set_test_cookie()
+
+    context = {
+        'version': '',
+    }
+
+    return render(request, 'frontend/index.html', context)
