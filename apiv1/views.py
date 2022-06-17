@@ -7,9 +7,9 @@ from django.core.files import File
 from rest_framework.renderers import JSONRenderer
 
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
-from .serializers import ResourceSerializer
+# from .serializers import ResourceSerializer
 
-from .models import Resource
+# from .models import Resource
 
 import requests
 import logging
@@ -19,27 +19,27 @@ logger = logging.getLogger(__name__)
 
 # Create your views here.
 class submitlink(APIView):
-    serializer_class = ResourceSerializer
+    # serializer_class = ResourceSerializer
 
-    @extend_schema(request=ResourceSerializer)
+    # @extend_schema(request=ResourceSerializer)
     def post(self, request, format=None):
         data = request.data['url']
         # thevid = Video.objects.get(id=38)
-        # print(data)
-        serializer = ResourceSerializer(data={'url': data})
-        if serializer.is_valid():
-            # serializer.errors
-            video = serializer.save()
-            print("serializser valid")
-            if video.ready:
-                file_response = FileResponse(video.audiofile)
-                file_response[
-                    'Content-Disposition'] = 'attachment; filename="' + video.filename + '"'
-                return file_response
-            else:
-                return JsonResponse({'id': video.id}, status=201)
+        print(data)
+        # serializer = ResourceSerializer(data={'url': data})
+        # if serializer.is_valid():
+        #     # serializer.errors
+        #     video = serializer.save()
+        #     print("serializser valid")
+        #     if video.ready:
+        #         file_response = FileResponse(video.audiofile)
+        #         file_response[
+        #             'Content-Disposition'] = 'attachment; filename="' + video.filename + '"'
+        #         return file_response
+        #     else:
+        #         return JsonResponse({'id': video.id}, status=201)
 
-        return JsonResponse(serializer.errors, status=400)
+        # return JsonResponse(serializer.errors, status=400)
 
 
 # Create your views here.
