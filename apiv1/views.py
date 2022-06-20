@@ -7,9 +7,10 @@ from django.core.files import File
 from rest_framework.renderers import JSONRenderer
 
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
-# from .serializers import ResourceSerializer
+from drf_spectacular.types import OpenApiTypes
+from .serializers import MediaResourceSerializer
 
-# from .models import Resource
+from .models import MediaResource
 
 import requests
 import logging
@@ -19,28 +20,34 @@ logger = logging.getLogger(__name__)
 
 # Create your views here.
 class submitlink(APIView):
-    # serializer_class = ResourceSerializer
+    serializer_class = MediaResourceSerializer
 
-    # @extend_schema(request=ResourceSerializer)
-    def post(self, request, format=None):
-        data = request.data['url']
+    @extend_schema(request=MediaResourceSerializer,
+                   parameters=[
+                       OpenApiParameter(name='url',
+                                        description='Youtube Url',
+                                        required=True,
+                                        type=str),
+                   ])
+    def get(self, request):
+        # data = request.data['id']
         # thevid = Video.objects.get(id=38)
-        print(data)
-        # serializer = ResourceSerializer(data={'url': data})
-        # if serializer.is_valid():
-        #     # serializer.errors
-        #     video = serializer.save()
-        #     print("serializser valid")
-        #     if video.ready:
-        #         file_response = FileResponse(video.audiofile)
-        #         file_response[
-        #             'Content-Disposition'] = 'attachment; filename="' + video.filename + '"'
-        #         return file_response
-        #     else:
-        #         return JsonResponse({'id': video.id}, status=201)
-
-        # return JsonResponse(serializer.errors, status=400)
-
+        print(request.GET.get('url', ''))
+        serializer = MediaResourceSerializer(
+            data={'url': request.GET.get('url', '')})
+        if serializer.is_valid():
+            # serializer.errors
+            media = serializer.save()
+            print("serializser valid: " + str(media))
+            # if video.ready:
+            #     file_response = FileResponse(video.audiofile)
+            #     file_response[
+            #         'Content-Disposition'] = 'attachment; filename="' + video.filename + '"'
+            #     return file_response
+            # else:
+            #     return JsonResponse({'id': video.id}, status=201)
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
 
 # Create your views here.
 class getfile(APIView):
@@ -68,7 +75,7 @@ class getfile(APIView):
         # vid = Video.objects.create(id=self.Newdownloadprocess.url)
         try:
             vid = Resource.objects.get(id=id)
-        
+
             print("ayooo")
             print(vid)
             print(vid.original_audiofile.path)
@@ -80,11 +87,12 @@ class getfile(APIView):
         except:
             return JsonResponse({'foo': 'bar'}, status=404)
 
+
 # class getvideo(APIView):
 #     def get(self, request, id, format=None):
 #         try:
 #             vid = Video.objects.get(id=id)
-        
+
 #             print("ayooo")
 #             print(vid)
 #             print(vid.original_videofile.path)
