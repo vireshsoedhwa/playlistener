@@ -7,17 +7,17 @@ import re
 
 from django_q.tasks import async_task, result, fetch
 
+import logging
+logger = logging.getLogger(__name__)
+
 def validate_url(value):
     print("validating")
     regExp = ".*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*"
     x = re.search(regExp, value)
     
     if x == None:
-        print("wrong validate")
+        print("Validation failed")
         raise serializers.ValidationError("Wrong URL")
-    
-    print(x.group(1) + " test test " + x.group(2))
-
 
 class MediaResourceSerializer(serializers.Serializer):
 
@@ -35,27 +35,14 @@ class MediaResourceSerializer(serializers.Serializer):
         regExp = ".*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*"
         x = re.search(regExp, validated_data["url"])
 
-        media = MediaResource.objects.create(id=x.group(2))
-        media.url = x.group(0)
-        media.save()
-            # task_id = async_task('apiv1.task.get_video', media, sync=False)
-            # print("NEW vid created: " + vid.urlid)
-        # except:
-            # vid = Video.objects.get(urlid=validated_data["url"][0])
-            # print("vid exists: " + vid.urlid)
-            # print("error creating model")
-
-        # return vid
-
-        # task_id = async_task('apiv1.task.get_video', newvid, sync=False)
-        # task = fetch(task_id)
-
-        # # and can be examined
-        # if not task.success:
-        #     print('An error occurred: {}'.format(task.result))
-
-        return media
-
+        try:
+            media = MediaResource.objects.create(id=x.group(2))
+            media.url = x.group(0)
+            media.save()
+            return media
+        except IntegrityError as e:
+            raise serializers.ValidationError("URL exists: " + validated_data["url"])
+        
     def update(self, instance, validated_data):
         instance.url = validated_data.get('url', instance.url)
         instance.save()

@@ -20,19 +20,19 @@ class MediaResource(models.Model):
     download_finished = models.BooleanField(null=True,
                                             blank=True,
                                             default=False)
-    audiofile_converted = models.BooleanField(null=True,
-                                              blank=True,
-                                              default=False)
-    status = models.TextField(max_length=200, null=True, blank=True)
-    original_videofile = models.FileField(upload_to=file_directory_path,
+    # audiofile_converted = models.BooleanField(null=True,
+    #                                           blank=True,
+    #                                           default=False)
+    # status = models.TextField(max_length=200, null=True, blank=True)
+    # original_videofile = models.FileField(upload_to=file_directory_path,
+    #                                       null=True,
+    #                                       blank=True)
+    audiofile = models.FileField(upload_to=file_directory_path,
                                           null=True,
                                           blank=True)
-    original_audiofile = models.FileField(upload_to=file_directory_path,
-                                          null=True,
-                                          blank=True)
-    converted_audiofile = models.FileField(upload_to=file_directory_path,
-                                           null=True,
-                                           blank=True)
+    # converted_audiofile = models.FileField(upload_to=file_directory_path,
+    #                                        null=True,
+    #                                        blank=True)
 
     # videofile = models.FileField(upload_to=file_directory_path, null=True, blank=True)
     # created_at = models.DateTimeField(auto_now_add=True)
@@ -42,6 +42,33 @@ class MediaResource(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+
+# Available for the media that is a track or a part of a music album:
+
+# track (string): Title of the track
+# track_number (numeric): Number of the track within an album or a disc
+# track_id (string): Id of the track
+# artist (string): Artist(s) of the track
+# genre (string): Genre(s) of the track
+# album (string): Title of the album the track belongs to
+# album_type (string): Type of the album
+# album_artist (string): List of all artists appeared on the album
+# disc_number (numeric): Number of the disc or other physical medium the track belongs to
+# release_year (numeric): Year (YYYY) when the album was released
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # # class TransactionDetail(models.Model):

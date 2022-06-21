@@ -11,12 +11,14 @@ from drf_spectacular.types import OpenApiTypes
 from .serializers import MediaResourceSerializer
 
 from .models import MediaResource
+from .youtube import YT
 
-import requests
+from django_q.tasks import async_task, result, fetch
+
+# import requests
 import logging
 
 logger = logging.getLogger(__name__)
-
 
 # Create your views here.
 class submitlink(APIView):
@@ -30,9 +32,9 @@ class submitlink(APIView):
                                         type=str),
                    ])
     def get(self, request):
-        # data = request.data['id']
-        # thevid = Video.objects.get(id=38)
         print(request.GET.get('url', ''))
+        
+        
         serializer = MediaResourceSerializer(
             data={'url': request.GET.get('url', '')})
         if serializer.is_valid():
@@ -46,6 +48,15 @@ class submitlink(APIView):
             #     return file_response
             # else:
             #     return JsonResponse({'id': video.id}, status=201)
+
+            async_task('apiv1.task.get_video', media, sync=False)
+    #         # task = fetch(task_id)
+    #         # # and can be examined
+    #         # if not task.success:
+    #         #     print('An error occurred: {}'.format(task.result))
+    #         #     return False
+    #         print("NEW vid created: " + vid.urlid)
+
             return JsonResponse(serializer.data, status=201)
         return JsonResponse(serializer.errors, status=400)
 
