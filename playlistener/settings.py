@@ -35,7 +35,6 @@ CSRF_COOKIE_HTTPONLY = True
 
 INSTALLED_APPS = [
     'apiv1',
-    'frontend',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

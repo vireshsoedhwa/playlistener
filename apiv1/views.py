@@ -20,6 +20,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 # Create your views here.
 class submitlink(APIView):
     serializer_class = MediaResourceSerializer
@@ -33,8 +34,7 @@ class submitlink(APIView):
                    ])
     def get(self, request):
         print(request.GET.get('url', ''))
-        
-        
+
         serializer = MediaResourceSerializer(
             data={'url': request.GET.get('url', '')})
         if serializer.is_valid():
@@ -50,15 +50,16 @@ class submitlink(APIView):
             #     return JsonResponse({'id': video.id}, status=201)
 
             async_task('apiv1.task.get_video', media, sync=False)
-    #         # task = fetch(task_id)
-    #         # # and can be examined
-    #         # if not task.success:
-    #         #     print('An error occurred: {}'.format(task.result))
-    #         #     return False
-    #         print("NEW vid created: " + vid.urlid)
+            #         # task = fetch(task_id)
+            #         # # and can be examined
+            #         # if not task.success:
+            #         #     print('An error occurred: {}'.format(task.result))
+            #         #     return False
+            #         print("NEW vid created: " + vid.urlid)
 
             return JsonResponse(serializer.data, status=201)
         return JsonResponse(serializer.errors, status=400)
+
 
 # Create your views here.
 class getfile(APIView):
@@ -114,3 +115,37 @@ class getfile(APIView):
 #             return file_response
 #         except:
 #             return JsonResponse({'foo': 'bar'}, status=404)
+
+
+class RootPath(APIView):
+    # permission_classes = [AllowAny]
+
+    def get(self, request, format=None):
+        # from .models import StatusResponse
+        # from .serializers import StatusResponseSerializer
+
+        # status = StatusResponse(version_number=settings.GIT_TAG)
+        # serializer = StatusResponseSerializer(status)
+
+        # return JsonResponse(serializer.data,
+        #                     json_dumps_params={'indent': 2},
+        #                     status=200)
+
+        return JsonResponse({"test":"value"},
+                            json_dumps_params={'indent': 2},
+                            status=200)
+
+
+from django.shortcuts import redirect
+
+
+def view_404(request, exception=None):
+    return redirect('/')
+
+
+def redirect_view(request, namespace, name, slug, actualurl):
+    return redirect('/' + actualurl)
+
+
+def redirect_root(request, namespace, name, slug):
+    return redirect('/')

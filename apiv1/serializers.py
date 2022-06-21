@@ -11,13 +11,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 def validate_url(value):
-    print("validating")
     regExp = ".*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*"
     x = re.search(regExp, value)
     
     if x == None:
-        print("Validation failed")
-        raise serializers.ValidationError("Wrong URL")
+        raise serializers.ValidationError("Not a Valid URL: " + value)
 
 class MediaResourceSerializer(serializers.Serializer):
 
@@ -40,8 +38,10 @@ class MediaResourceSerializer(serializers.Serializer):
             media.url = x.group(0)
             media.save()
             return media
-        except IntegrityError as e:
-            raise serializers.ValidationError("URL exists: " + validated_data["url"])
+        except (IntegrityError) as e:
+            raise serializers.ValidationError("URL Exists: " + validated_data["url"])
+        except AttributeError as e:
+            raise serializers.ValidationError("Not a Valid URL: " + validated_data["url"])
         
     def update(self, instance, validated_data):
         instance.url = validated_data.get('url', instance.url)

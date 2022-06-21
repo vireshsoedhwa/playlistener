@@ -1,52 +1,15 @@
 version: '3.8'
     
 services:
-  # db:
-  #   image: postgres
-  #   environment:
-  #     - POSTGRES_DB=postgres
-  #     - POSTGRES_USER=postgres
-  #     - POSTGRES_PASSWORD=postgres
-  #   volumes:
-  #     - db-volume:/var/lib/postgres
-  #   networks:
-  #     - app-network
-  # redis:
-  #   image: redis:5
-  #   networks:
-  #         - app-network
   app:
-    image: playlistener
+    image: playlistener-api
     build: 
       context: .
-
-    # command: python manage.py runserver 0.0.0.0:8001 
-    # command: supervisord -c supervisord.conf -n
-          # && (cd /code/frontend && npm run build)
-    command: >
-      sh -c "(cd /code/frontend && npm install)
-      && (cd /code/frontend && npm install)
-      && python manage.py runserver 0.0.0.0:9002"
-      
-     # && python manage.py runserver 0.0.0.0:9000"
-
-    # restart: unless-stopped
-    # tty: true
+    # command: python manage.py runserver 0.0.0.0:9002
     volumes:
       - .:/code
     ports:
+      - "9000:9000"    
+      - "9001:9001"
       - "9002:9002"
-    # depends_on:
-    #   - redis
-    # working_dir: /code
-    networks:
-      - app-network
-
-
-# volumes:
-#   db-volume: 
-
-networks:
-  app-network:
-    driver: bridge
 

@@ -15,7 +15,6 @@ RUN set -ex; \
             ffmpeg \
             gcc \
             nginx \
-            npm \
         ; \
         \
         python -m venv /opt/venv; \
@@ -23,9 +22,9 @@ RUN set -ex; \
         pip install --upgrade pip; \
         pip install -r requirements.txt;
 
-RUN apt-get install -y curl
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-RUN apt-get install -y nodejs
+# RUN apt-get install -y curl
+# RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+# RUN apt-get install -y nodejs
 
 RUN mkdir -p /run/daphne
 
@@ -33,20 +32,21 @@ COPY manage.py supervisord.conf ./
 COPY docker-entrypoint.sh /usr/local/bin
 
 COPY /nginx/nginx.conf /etc/nginx/nginx.conf
-COPY frontend frontend
+# COPY frontend frontend
 COPY playlistener playlistener
 COPY apiv1 apiv1
 
-WORKDIR /code/frontend
+# WORKDIR /code/frontend
 
-RUN npm install
-RUN npm run build
+# RUN npm install
+# RUN npm run build
 
 WORKDIR /code
 EXPOSE 9000
+EXPOSE 9001
+EXPOSE 9002
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["supervisord", "-c", "supervisord.conf", "-n"]
-
-
+# CMD ["nginx", "-g", "daemon off;"]
 
