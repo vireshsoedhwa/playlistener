@@ -46,7 +46,7 @@ class submitlink(APIView):
                 if media.busy is False:
                     async_task('apiv1.task.get_video', media, sync=False)
                     return JsonResponse(serializer.data, status=202)
-                # download not finished and is not busy
+                # download not finished and is in progress
                 return JsonResponse(serializer.data, status=201)
             else:
                 # download is Finished

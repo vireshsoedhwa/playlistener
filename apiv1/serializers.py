@@ -36,18 +36,6 @@ class MediaResourceSerializer(serializers.Serializer):
             media = MediaResource.objects.create(id=video_id)
             media.save()
             return media
-
-        # try:
-        #     media = MediaResource.objects.create(id=video_id)
-        #     media.url = x.group(0)
-        #     media.save()
-        #     return media
-        # except (IntegrityError) as e:
-        #     media = MediaResource.objects.get(id=video_id)
-        #     return media
-        #     # raise serializers.ValidationError("URL Exists: " + validated_data["url"] + " --> FileName: " + str(media.audiofile))
-        # except AttributeError as e:
-        #     raise serializers.ValidationError("Not a Valid URL: " + validated_data["url"])
         
     def update(self, instance, validated_data):
         instance.url = validated_data.get('url', instance.url)
