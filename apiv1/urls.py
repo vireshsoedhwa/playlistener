@@ -6,7 +6,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 
 urlpatterns = [
     path('submitlink', views.submitlink.as_view()),
-    # path('getfile/<id>', views.getfile.as_view()),
+    path('getfile/<id>', views.getfile.as_view()),
     # YOUR PATTERNS
     # path('schema/', SpectacularAPIView.as_view(), name='schema'),
     # Optional UI:

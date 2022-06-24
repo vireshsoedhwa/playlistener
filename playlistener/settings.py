@@ -161,7 +161,7 @@ MEDIA_ROOT = '/code/dl/'
 
 Q_CLUSTER = {
     'name': 'myproject',
-    'max_attempts':2,
+    'max_attempts': 1,
     'retry': 1000,
     'workers': 8,
     'recycle': 500,

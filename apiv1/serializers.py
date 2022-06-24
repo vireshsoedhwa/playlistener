@@ -19,27 +19,35 @@ def validate_url(value):
 
 class MediaResourceSerializer(serializers.Serializer):
 
-    url = serializers.URLField(validators=[validate_url],
-                                max_length=None,
+    id = serializers.CharField(validators=[validate_url],
+                                max_length=250,
                                 min_length=None,
                                 allow_blank=True)
 
     def create(self, validated_data):
         regExp = ".*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*"
-        x = re.search(regExp, validated_data["url"])
-        
+        x = re.search(regExp, validated_data["id"])
         video_id = x.group(2)
-
-        try:
+        # Check if object exists
+        num_media = MediaResource.objects.filter(id=video_id).count()
+        if num_media != 0:
+            return MediaResource.objects.get(id=video_id)
+        else:
             media = MediaResource.objects.create(id=video_id)
-            media.url = x.group(0)
             media.save()
             return media
-        except (IntegrityError) as e:
-            media = MediaResource.objects.get(id=video_id)
-            raise serializers.ValidationError("URL Exists: " + validated_data["url"] + "FileName: " + str(media.audiofile))
-        except AttributeError as e:
-            raise serializers.ValidationError("Not a Valid URL: " + validated_data["url"])
+
+        # try:
+        #     media = MediaResource.objects.create(id=video_id)
+        #     media.url = x.group(0)
+        #     media.save()
+        #     return media
+        # except (IntegrityError) as e:
+        #     media = MediaResource.objects.get(id=video_id)
+        #     return media
+        #     # raise serializers.ValidationError("URL Exists: " + validated_data["url"] + " --> FileName: " + str(media.audiofile))
+        # except AttributeError as e:
+        #     raise serializers.ValidationError("Not a Valid URL: " + validated_data["url"])
         
     def update(self, instance, validated_data):
         instance.url = validated_data.get('url', instance.url)

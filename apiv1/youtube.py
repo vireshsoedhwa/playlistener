@@ -4,6 +4,8 @@ from django.core.files.base import ContentFile
 from django.core.files import File
 
 import re
+import json
+
 
 class YT:
 
@@ -21,34 +23,58 @@ class YT:
             'logger':
             MyLogger(),
             'progress_hooks': [self.my_hook],
-            'download_archive': '/code/dl/archive',
+            # 'download_archive': '/code/dl/archive',
+            'download_archive':
+            '/code/dl/' + str(mediaobject.id) + '/archive',
             'keepvideo': False,
             'cachedir': False,
+            # 'forcetitle':
+            # True,
+            # 'writeinfojson':
+            # '/code/dl/' + str(mediaobject.id),
+            'restrictfilenames': True,
             'outtmpl': '/code/dl/%(id)s/%(title)s.%(ext)s',
         }
 
     def my_hook(self, d):
+        print(d['status'])
         if d['status'] == 'downloading':
-            print('Downloadingg it ' + str(d['downloaded_bytes']) + "/" +
-                  str(d['total_bytes']))
+            # print('Downloadingg it ' + str(d['downloaded_bytes']) + "/" +
+            #       str(d['total_bytes']))
+            pass
         if d['status'] == 'error':
             print('Error happened')
+            self.mediaobject.busy = False
+            self.mediaobject.save()
         if d['status'] == 'finished':
             print('download finished')
 
             get_just_filename = re.search(r"(.*\/)([^\/]*)\.[a-zA-Z0-9]*",
                                           d['filename'])
-            self.mediaobject.title = get_just_filename.group(2)
+            # self.mediaobject.title = get_just_filename.group(2)
             self.mediaobject.audiofile.name = get_just_filename.group(
                 1) + get_just_filename.group(2) + ".mp3"
             self.mediaobject.download_finished = True
+            self.mediaobject.busy = False
             self.mediaobject.save()
 
     def run(self):
+        youtube_target_url = "https://youtube.com/watch?v=" + self.mediaobject.id
+
         with youtube_dl.YoutubeDL(self.ydl_opts) as ydl:
-            ydl.download([self.mediaobject.url])
-
-
+            jsontry = ydl.extract_info(youtube_target_url,
+                                       download=False,
+                                       ie_key=None,
+                                       extra_info={},
+                                       process=True,
+                                       force_generic_extractor=False)
+            
+            self.mediaobject.title = jsontry["title"]
+            self.mediaobject.download_finished = False
+            self.mediaobject.busy = True
+            self.mediaobject.save()
+            ydl.download([youtube_target_url])
+            
 class MyLogger(object):
 
     def debug(self, msg):

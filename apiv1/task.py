@@ -11,10 +11,6 @@ def get_video(media):
     newmedia = YT(media)
     newmedia.run()
 
-
-
-
-
     # try:
     #     newdownload = YT(vidobject.urlid, vidobject)
     #     newdownload.run()

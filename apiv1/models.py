@@ -10,16 +10,19 @@ import re
 def file_directory_path(instance, filename):
     return '/code/dl/{0}/{1}'.format(instance.id, instance.filename)
 
+
 # def my_callback(sender, **kwargs):
 #     print("")
 
+
 class MediaResource(models.Model):
     id = models.TextField(primary_key=True, max_length=200, blank=True)
-    url = models.URLField(max_length=200, null=True, blank=True)
-    title = models.TextField(max_length=200, null=True, blank=True)
+    # url = models.URLField(max_length=200, null=True, blank=True)
+    title = models.TextField(max_length=500, null=True, blank=True)
     download_finished = models.BooleanField(null=True,
                                             blank=True,
                                             default=False)
+    busy = models.BooleanField(null=True, blank=True, default=False)
     # audiofile_converted = models.BooleanField(null=True,
     #                                           blank=True,
     #                                           default=False)
@@ -28,8 +31,10 @@ class MediaResource(models.Model):
     #                                       null=True,
     #                                       blank=True)
     audiofile = models.FileField(upload_to=file_directory_path,
-                                          null=True,
-                                          blank=True)
+                                 null=True,
+                                 blank=True,
+                                 max_length=500)
+
     # converted_audiofile = models.FileField(upload_to=file_directory_path,
     #                                        null=True,
     #                                        blank=True)
@@ -41,7 +46,7 @@ class MediaResource(models.Model):
     #     constraints = [UniqueConstraint(fields=['id'], name="vid-id")]
 
     def __str__(self):
-        return str(self.id)
+        return str(self.title)
 
 
 # Available for the media that is a track or a part of a music album:
@@ -56,20 +61,6 @@ class MediaResource(models.Model):
 # album_artist (string): List of all artists appeared on the album
 # disc_number (numeric): Number of the disc or other physical medium the track belongs to
 # release_year (numeric): Year (YYYY) when the album was released
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # # class TransactionDetail(models.Model):
 # #     product = models.ForeignKey(Product)

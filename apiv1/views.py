@@ -20,7 +20,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 # Create your views here.
 class submitlink(APIView):
     serializer_class = MediaResourceSerializer
@@ -33,101 +32,55 @@ class submitlink(APIView):
                                         type=str),
                    ])
     def get(self, request):
-        print(request.GET.get('url', ''))
+        # print(request.GET.get('url', ''))
 
         serializer = MediaResourceSerializer(
-            data={'url': request.GET.get('url', '')})
+            data={'id': request.GET.get('url', '')})
         if serializer.is_valid():
             # serializer.errors
             media = serializer.save()
             print("serializser valid: " + str(media))
 
-            if media.audiofile == None:
-                async_task('apiv1.task.get_video', media, sync=False)
+            if media.download_finished is False:
+                # download not finished
+                if media.busy is False:
+                    async_task('apiv1.task.get_video', media, sync=False)
+                    return JsonResponse(serializer.data, status=202)
+                # download not finished and is not busy
                 return JsonResponse(serializer.data, status=201)
             else:
-                return JsonResponse(serializer.data, status=100)
+                # download is Finished
+                return JsonResponse(serializer.data, status=200)
 
         return JsonResponse(serializer.errors, status=400)
 
-
 # Create your views here.
 class getfile(APIView):
-    # serializer_class = VideoSerializer
-    # @extend_schema(
-    #     request=VideoSerializer
-    # )
+    serializer_class = MediaResource
+    @extend_schema(
+        request=MediaResource
+    )
     def get(self, request, id, format=None):
-        # data = request.data['url']
-        # # thevid = Video.objects.get(id=38)
-        # # print(data)
-        # serializer = VideoSerializer(data={'url': data})
-        # if serializer.is_valid():
-        #     # serializer.errors
-        #     video = serializer.save()
-        #     print("serializser valid")
-        #     if video.ready:
-        #         file_response = FileResponse(video.audiofile)
-        #         file_response[
-        #             'Content-Disposition'] = 'attachment; filename="' + video.filename + '"'
-        #         return file_response
-        #     else:
-        #         return JsonResponse({'id': video.id}, status=201)
-
-        # vid = Video.objects.create(id=self.Newdownloadprocess.url)
         try:
             vid = MediaResource.objects.get(id=id)
 
-            print("ayooo")
-            print(vid)
-            print(vid.original_audiofile.path)
-
-            file_response = FileResponse(vid.original_audiofile)
+            file_response = FileResponse(vid.audiofile)
             file_response[
                 'Content-Disposition'] = 'attachment; filename="' + vid.title + 'mp3"'
             return file_response
         except:
-            return JsonResponse({'foo': 'bar'}, status=404)
-
-
-# class getvideo(APIView):
-#     def get(self, request, id, format=None):
-#         try:
-#             vid = Video.objects.get(id=id)
-
-#             print("ayooo")
-#             print(vid)
-#             print(vid.original_videofile.path)
-
-#             file_response = FileResponse(vid.original_videofile)
-#             file_response[
-#                 'Content-Disposition'] = 'attachment; filename="' + vid.title + 'mp3"'
-#             return file_response
-#         except:
-#             return JsonResponse({'foo': 'bar'}, status=404)
-
+            return JsonResponse({'id': id}, status=404)
 
 class RootPath(APIView):
     # permission_classes = [AllowAny]
 
     def get(self, request, format=None):
-        # from .models import StatusResponse
-        # from .serializers import StatusResponseSerializer
-
-        # status = StatusResponse(version_number=settings.GIT_TAG)
-        # serializer = StatusResponseSerializer(status)
-
-        # return JsonResponse(serializer.data,
-        #                     json_dumps_params={'indent': 2},
-        #                     status=200)
 
         return JsonResponse({"test":"value"},
                             json_dumps_params={'indent': 2},
                             status=200)
 
-
 from django.shortcuts import redirect
-
 
 def view_404(request, exception=None):
     return redirect('/')
