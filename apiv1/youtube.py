@@ -5,7 +5,6 @@ from django.core.files import File
 
 import re
 
-
 class YT:
 
     def __init__(self, mediaobject):

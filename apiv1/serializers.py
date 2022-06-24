@@ -27,14 +27,17 @@ class MediaResourceSerializer(serializers.Serializer):
     def create(self, validated_data):
         regExp = ".*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*"
         x = re.search(regExp, validated_data["url"])
+        
+        video_id = x.group(2)
 
         try:
-            media = MediaResource.objects.create(id=x.group(2))
+            media = MediaResource.objects.create(id=video_id)
             media.url = x.group(0)
             media.save()
             return media
         except (IntegrityError) as e:
-            raise serializers.ValidationError("URL Exists: " + validated_data["url"])
+            media = MediaResource.objects.get(id=video_id)
+            raise serializers.ValidationError("URL Exists: " + validated_data["url"] + "FileName: " + str(media.audiofile))
         except AttributeError as e:
             raise serializers.ValidationError("Not a Valid URL: " + validated_data["url"])
         

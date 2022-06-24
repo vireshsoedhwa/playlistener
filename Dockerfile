@@ -28,14 +28,8 @@ COPY manage.py supervisord.conf ./
 COPY docker-entrypoint.sh /usr/local/bin
 
 COPY /nginx/nginx.conf /etc/nginx/nginx.conf
-# COPY frontend frontend
 COPY playlistener playlistener
 COPY apiv1 apiv1
-
-# WORKDIR /code/frontend
-
-# RUN npm install
-# RUN npm run build
 
 WORKDIR /code
 EXPOSE 9000

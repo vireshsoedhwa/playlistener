@@ -25,7 +25,6 @@ urlpatterns = [
     # path('', include('frontend.urls'))
 ]
 
-
 if settings.DEBUG:
     # OPENAPI
     # PATTERNS
