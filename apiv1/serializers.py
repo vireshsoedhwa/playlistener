@@ -15,19 +15,14 @@ def validate_url(value):
     x = re.search(regExp, value)
     
     if x == None:
-        raise serializers.ValidationError("Not a Valid URL: " + value)
+        raise serializers.ValidationError("Not a Valid youtube URL: " + value)
 
 class MediaResourceSerializer(serializers.Serializer):
 
-    url = serializers.CharField(validators=[validate_url],
+    url = serializers.URLField(validators=[validate_url],
                                 max_length=None,
                                 min_length=None,
-                                allow_blank=True,
-                                trim_whitespace=True)
-
-    class Meta:
-        model = MediaResource
-        fields = ('id')
+                                allow_blank=True)
 
     def create(self, validated_data):
         regExp = ".*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*"

@@ -22,10 +22,6 @@ RUN set -ex; \
         pip install --upgrade pip; \
         pip install -r requirements.txt;
 
-# RUN apt-get install -y curl
-# RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-# RUN apt-get install -y nodejs
-
 RUN mkdir -p /run/daphne
 
 COPY manage.py supervisord.conf ./
@@ -43,8 +39,6 @@ COPY apiv1 apiv1
 
 WORKDIR /code
 EXPOSE 9000
-EXPOSE 9001
-EXPOSE 9002
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["supervisord", "-c", "supervisord.conf", "-n"]

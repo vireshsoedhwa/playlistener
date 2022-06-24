@@ -41,23 +41,13 @@ class submitlink(APIView):
             # serializer.errors
             media = serializer.save()
             print("serializser valid: " + str(media))
-            # if video.ready:
-            #     file_response = FileResponse(video.audiofile)
-            #     file_response[
-            #         'Content-Disposition'] = 'attachment; filename="' + video.filename + '"'
-            #     return file_response
-            # else:
-            #     return JsonResponse({'id': video.id}, status=201)
 
-            async_task('apiv1.task.get_video', media, sync=False)
-            #         # task = fetch(task_id)
-            #         # # and can be examined
-            #         # if not task.success:
-            #         #     print('An error occurred: {}'.format(task.result))
-            #         #     return False
-            #         print("NEW vid created: " + vid.urlid)
+            if media.audiofile == None:
+                async_task('apiv1.task.get_video', media, sync=False)
+                return JsonResponse(serializer.data, status=201)
+            else:
+                return JsonResponse(serializer.data, status=100)
 
-            return JsonResponse(serializer.data, status=201)
         return JsonResponse(serializer.errors, status=400)
 
 
@@ -86,7 +76,7 @@ class getfile(APIView):
 
         # vid = Video.objects.create(id=self.Newdownloadprocess.url)
         try:
-            vid = Resource.objects.get(id=id)
+            vid = MediaResource.objects.get(id=id)
 
             print("ayooo")
             print(vid)

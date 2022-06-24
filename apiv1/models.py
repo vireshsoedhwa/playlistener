@@ -15,7 +15,7 @@ def file_directory_path(instance, filename):
 
 class MediaResource(models.Model):
     id = models.TextField(primary_key=True, max_length=200, blank=True)
-    url = models.TextField(max_length=200, null=True, blank=True)
+    url = models.URLField(max_length=200, null=True, blank=True)
     title = models.TextField(max_length=200, null=True, blank=True)
     download_finished = models.BooleanField(null=True,
                                             blank=True,

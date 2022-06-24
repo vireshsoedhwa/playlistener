@@ -42,6 +42,7 @@ class YT:
             self.mediaobject.title = get_just_filename.group(2)
             self.mediaobject.audiofile.name = get_just_filename.group(
                 1) + get_just_filename.group(2) + ".mp3"
+            self.mediaobject.download_finished = True
             self.mediaobject.save()
 
     def run(self):
