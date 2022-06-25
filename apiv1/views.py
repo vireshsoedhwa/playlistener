@@ -66,7 +66,7 @@ class getfile(APIView):
 
             file_response = FileResponse(vid.audiofile)
             file_response[
-                'Content-Disposition'] = 'attachment; filename="' + vid.title + 'mp3"'
+                'Content-Disposition'] = 'attachment; filename="' + vid.title
             return file_response
         except:
             return JsonResponse({'id': id}, status=404)

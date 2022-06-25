@@ -19,6 +19,7 @@ class MediaResource(models.Model):
     id = models.TextField(primary_key=True, max_length=200, blank=True)
     # url = models.URLField(max_length=200, null=True, blank=True)
     title = models.TextField(max_length=500, null=True, blank=True)
+    description = models.TextField(max_length=5000, null=True, blank=True)
     download_finished = models.BooleanField(null=True,
                                             blank=True,
                                             default=False)

@@ -4,8 +4,6 @@ from django.core.files.base import ContentFile
 from django.core.files import File
 
 import re
-import json
-
 
 class YT:
 
@@ -70,6 +68,7 @@ class YT:
                                        force_generic_extractor=False)
             
             self.mediaobject.title = jsontry["title"]
+            self.mediaobject.description = jsontry["description"]
             self.mediaobject.download_finished = False
             self.mediaobject.busy = True
             self.mediaobject.save()
