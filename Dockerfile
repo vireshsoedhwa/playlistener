@@ -25,9 +25,9 @@ RUN mkdir -p /run/daphne
 COPY manage.py supervisord.conf ./
 COPY docker-entrypoint.sh /usr/local/bin
 
-COPY /nginx/nginx.conf /etc/nginx/nginx.conf
+# COPY /nginx/nginx.conf /etc/nginx/nginx.conf
 COPY playlistener playlistener
-COPY frontend frontend
+# COPY frontend frontend
 COPY apiv1 apiv1
 
 WORKDIR /code
@@ -35,7 +35,7 @@ EXPOSE 9000
 EXPOSE 9001
 
 ENTRYPOINT ["docker-entrypoint.sh"]
-# CMD ["supervisord", "-c", "supervisord.conf", "-n"]
-CMD ["daphne", "-b", "0.0.0.0", "-p", "9001", "playlistener.asgi:application"]
+CMD ["supervisord", "-c", "supervisord.conf", "-n"]
+# CMD ["daphne", "-b", "0.0.0.0", "-p", "9001", "playlistener.asgi:application"]
 # CMD ["nginx", "-g", "daemon off;"]
 
