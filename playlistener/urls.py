@@ -21,7 +21,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    path('api/', include('apiv1.urls'))
+    path('api/', include('apiv1.urls')),
     # path('', include('frontend.urls'))
 ]
 
@@ -30,11 +30,12 @@ if settings.DEBUG:
     # PATTERNS
     # UI:
     urlpatterns += [
-        path('api/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-        path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+        # path('api/', SpectacularSwaggerView.as_view(url_name='schema'),
+        #      name='swagger-ui'),
+        # path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
         path('admin/', admin.site.urls)
     ]
-else:
-    urlpatterns += [path('', views.RootPath.as_view(), name='root')]
+# else:
+#     urlpatterns += [path('', views.RootPath.as_view(), name='root')]
 
-handler404 = 'apiv1.views.view_404'
+# handler404 = 'apiv1.views.view_404'

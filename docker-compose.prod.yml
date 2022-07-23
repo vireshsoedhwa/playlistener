@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:alpine
+    restart: always
+    volumes:
+      - dbprod:/var/lib/postgresql/data
+    env_file:
+      - db.env
+    networks:
+      - app-network
+
+  app:
+    volumes:
+      - data:/data
+    environment:
+      - DEBUG=1
+      - PRODUCTION=1
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+    env_file:
+      - db.env
+    depends_on:
+      - db
+    ports:
+      - 9001:9001
+    networks:
+      - app-network
+        # aliases:
+        #   - api.local
+
+volumes:
+  dbprod:
+    # external: true
+  data:
+    # external: true
+  
+networks:
+  app-network:
+    # external: true
+    # driver: bridge
+    name: app-network

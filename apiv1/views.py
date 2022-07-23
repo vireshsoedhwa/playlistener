@@ -35,23 +35,23 @@ class submitlink(APIView):
         # print(request.GET.get('url', ''))
 
         serializer = MediaResourceSerializer(
-            data={'id': request.GET.get('url', '')})
+            data={'youtube_id': request.GET.get('url', '')})
         if serializer.is_valid():
             # serializer.errors
-            media = serializer.save()
-            print("serializser valid: " + str(media))
+            instance = serializer.save()
+            print("serializser valid: " + str(instance))
 
-            if media.download_finished is False:
+            if instance.download_finished is False:
                 # download not finished
-                if media.busy is False:
-                    async_task('apiv1.task.get_video', media, sync=False)
+                if instance.busy is False:
+                    async_task('apiv1.task.get_video', instance, sync=False)
                     return JsonResponse(serializer.data, status=202)
                 # download not finished and is in progress
                 return JsonResponse(serializer.data, status=201)
             else:
                 # download is Finished
-                return JsonResponse(serializer.data, status=200)
-
+                return JsonResponse(serializer.data, status=200)            
+        # return HttpResponse("", status=200)
         return JsonResponse(serializer.errors, status=400)
 
 # Create your views here.
@@ -62,11 +62,19 @@ class getfile(APIView):
     )
     def get(self, request, id, format=None):
         try:
-            vid = MediaResource.objects.get(id=id)
+            instance = MediaResource.objects.get(id=id)
+            
+            if instance.audiofile is None:
+                return JsonResponse({'id': id}, status=404)
+            filename = 'download'            
+            if instance.title is None:
+                filename = instance.audiofile.name
+            else:
+                filename = instance.title
 
-            file_response = FileResponse(vid.audiofile)
+            file_response = FileResponse(instance.audiofile)
             file_response[
-                'Content-Disposition'] = 'attachment; filename="' + vid.title
+                'Content-Disposition'] = 'attachment; filename="' + filename
             return file_response
         except:
             return JsonResponse({'id': id}, status=404)

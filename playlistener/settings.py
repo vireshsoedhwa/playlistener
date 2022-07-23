@@ -15,11 +15,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-# BASE_DIR = Path(__file__).resolve().parent.parent
-
-
+                    
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -27,7 +23,8 @@ load_dotenv()
 # SECRET_KEY = 'm925%@rztqnd=%6l9neo!h2w=ro_iaw-uryy!jlsdvrmnl-qie'
 SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', False) == 'True'
+DEBUG = os.getenv('DEBUG', False) == '1'
+PRODUCTION = os.getenv('PRODUCTION', False) == '1'
 
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS=['http://localhost:9000']
@@ -38,7 +35,6 @@ CSRF_COOKIE_HTTPONLY = True
 # Application definition
 
 INSTALLED_APPS = [
-    'apiv1',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,6 +47,9 @@ INSTALLED_APPS = [
     'django_q',
     'drf_spectacular',
     'channels',
+    
+    'apiv1'
+    # 'frontend'
 ]
 
 MIDDLEWARE = [
@@ -106,14 +105,25 @@ CHANNEL_LAYERS = {
 #     }
 # }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgres',
+#         'USER': 'postgres',
+#         'PASSWORD': 'postgres',
+#         'HOST': 'db',
+#         'PORT': 5432,
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
-        'PORT': 5432,
+        'NAME': os.environ['POSTGRES_DB'],
+        'USER': os.environ['POSTGRES_USER'],
+        'PASSWORD': os.environ['POSTGRES_PASSWORD'],
+        'HOST': os.environ['POSTGRES_HOST'],
+        'PORT': int(os.environ['POSTGRES_PORT']),
     }
 }
 

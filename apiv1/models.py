@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.files.storage import FileSystemStorage
 from django.db.models import Deferrable, UniqueConstraint
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
 import re
@@ -16,8 +16,9 @@ def file_directory_path(instance, filename):
 
 
 class MediaResource(models.Model):
-    id = models.TextField(primary_key=True, max_length=200, blank=True)
-    # url = models.URLField(max_length=200, null=True, blank=True)
+    # id = models.TextField(primary_key=True, max_length=200, blank=True)
+    id = models.AutoField(primary_key=True)
+    youtube_id = models.TextField(unique=True, max_length=200, blank=True)
     title = models.TextField(max_length=500, null=True, blank=True)
     description = models.TextField(max_length=5000, null=True, blank=True)
     download_finished = models.BooleanField(null=True,
@@ -36,18 +37,13 @@ class MediaResource(models.Model):
                                  blank=True,
                                  max_length=500)
 
-    # converted_audiofile = models.FileField(upload_to=file_directory_path,
-    #                                        null=True,
-    #                                        blank=True)
-
-    # videofile = models.FileField(upload_to=file_directory_path, null=True, blank=True)
-    # created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     # class Meta:
     #     constraints = [UniqueConstraint(fields=['id'], name="vid-id")]
 
     def __str__(self):
-        return str(self.title)
+        return str(self.id)
 
 
 # Available for the media that is a track or a part of a music album:
@@ -74,3 +70,9 @@ class MediaResource(models.Model):
 # #     post_save.disconnect(update_urlid, sender=Video)
 # #     instance.save()
 # #     post_save.connect(update_urlid, sender=Video)
+
+# # method for deleting
+@receiver(post_delete, sender=MediaResource, dispatch_uid="delete_yt_archive_record")
+def update_urlid(sender, instance, **kwargs):
+
+    print(f"Deleted ID:{instance.id} with youtube id {instance.youtube_id}")

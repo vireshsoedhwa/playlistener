@@ -5,19 +5,22 @@ from django.core.files import File
 
 import re
 
+
 class YT:
 
     def __init__(self, mediaobject):
         self.mediaobject = mediaobject
 
         self.ydl_opts = {
+            'writethumbnail': True,
             'format':
             'bestaudio/best',
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'mp3',
                 'preferredquality': '320',
-            }],
+            },
+                {'key': 'EmbedThumbnail', }],
             'logger':
             MyLogger(),
             'progress_hooks': [self.my_hook],
@@ -31,7 +34,8 @@ class YT:
             # 'writeinfojson':
             # '/code/dl/' + str(mediaobject.id),
             'restrictfilenames': True,
-            'outtmpl': '/code/dl/%(id)s/%(title)s.%(ext)s',
+            # 'outtmpl': '/code/dl/%(id)s/%(title)s.%(ext)s',
+            'outtmpl': '/code/dl/' + str(mediaobject.id) + '/%(title)s.%(ext)s',
         }
 
     def my_hook(self, d):
@@ -57,7 +61,8 @@ class YT:
             self.mediaobject.save()
 
     def run(self):
-        youtube_target_url = "https://youtube.com/watch?v=" + self.mediaobject.id
+        youtube_target_url = "https://youtube.com/watch?v=" + \
+            str(self.mediaobject.youtube_id)
 
         with youtube_dl.YoutubeDL(self.ydl_opts) as ydl:
             jsontry = ydl.extract_info(youtube_target_url,
@@ -66,14 +71,15 @@ class YT:
                                        extra_info={},
                                        process=True,
                                        force_generic_extractor=False)
-            
+
             self.mediaobject.title = jsontry["title"]
             self.mediaobject.description = jsontry["description"]
             self.mediaobject.download_finished = False
             self.mediaobject.busy = True
             self.mediaobject.save()
             ydl.download([youtube_target_url])
-            
+
+
 class MyLogger(object):
 
     def debug(self, msg):

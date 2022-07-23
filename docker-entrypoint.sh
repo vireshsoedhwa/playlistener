@@ -10,7 +10,7 @@ echo "--------------------------------------------------------------------------
 python manage.py migrate
 echo "-------------------------------------------------------------------------------------------\n"
 
-#Collect static files
+# # Collect static files
 # >&2 echo "Collect static"
 # python manage.py collectstatic --noinput
 
@@ -27,7 +27,7 @@ echo "--------------------------------------------------------------------------
 
 # Start NGINX
 >&2 echo "Starting nginx..."
-nginx
+# nginx
 
 # >&2 echo "Starting supervisor..."
 # supervisord -c supervisord.conf
@@ -35,6 +35,8 @@ nginx
 # Start Django dev server
 >&2 echo "Starting supervisor..."
 exec "$@"
+
+# daphne -b 0.0.0.0 -p 9001 playlistener.asgi:application
 
 #Start NGINX
 # >&2 echo "Starting nginx..."

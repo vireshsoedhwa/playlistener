@@ -7,4 +7,5 @@ class Apiv1Config(AppConfig):
 
     def ready(self):
         print("DEBUG: " + str(settings.DEBUG))
+        print("PRODUCTION: " + str(settings.PRODUCTION))
         print("apiv1 has started")
