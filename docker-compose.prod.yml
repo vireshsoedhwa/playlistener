@@ -30,7 +30,6 @@ services:
         aliases:
           - api
 
-
   proxy:
     image: nginx:stable-alpine
     volumes:
@@ -42,8 +41,6 @@ services:
       - app-network
 
 volumes:
-  # dbprod:
-    # external: true
   dataprod:
     # external: true
   
