@@ -95,7 +95,7 @@ from django.core.files.base import ContentFile
 #     #         print("not found")
 #     #         vid = Video.objects.create(url=self.url, urlid=self.urlid)
 #     #         vid.save()
-#     #         async_task('apiv1.task.get_video', vid, sync=False, hook='apiv1.consumers.finished_task')
+#     #         async_task('api.task.get_video', vid, sync=False, hook='api.consumers.finished_task')
 #     #         # task = fetch(task_id)
 #     #         # # and can be examined
 #     #         # if not task.success:

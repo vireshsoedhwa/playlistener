@@ -3,7 +3,7 @@
 set -e
 
 >&2 echo "Make Database migrations"
-python manage.py makemigrations apiv1
+python manage.py makemigrations api
 echo "-------------------------------------------------------------------------------------------\n"
 
 >&2 echo "Run Database migrations"
@@ -23,21 +23,5 @@ echo "from django.contrib.auth.models import User; User.objects.filter(username=
 
 echo "-------------------------------------------------------------------------------------------\n"
 
-# tail -f /dev/null
-
-# Start NGINX
->&2 echo "Starting nginx..."
-# nginx
-
-# >&2 echo "Starting supervisor..."
-# supervisord -c supervisord.conf
-
-# Start Django dev server
 >&2 echo "Starting supervisor..."
 exec "$@"
-
-# daphne -b 0.0.0.0 -p 9001 playlistener.asgi:application
-
-#Start NGINX
-# >&2 echo "Starting nginx..."
-# nginx -g 'daemon off;'

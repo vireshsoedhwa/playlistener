@@ -27,7 +27,7 @@ DEBUG = os.getenv('DEBUG', False) == '1'
 PRODUCTION = os.getenv('PRODUCTION', False) == '1'
 
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS=['http://localhost:9000']
+CSRF_TRUSTED_ORIGINS=['*']
 
 CSRF_USE_SESSIONS = True
 CSRF_COOKIE_HTTPONLY = True
@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'channels',
     
-    'apiv1'
+    'api'
     # 'frontend'
 ]
 

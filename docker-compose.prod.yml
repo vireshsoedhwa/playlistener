@@ -5,15 +5,15 @@ services:
     image: postgres:alpine
     restart: always
     volumes:
-      - dbprod:/var/lib/postgresql/data
+      - dataprod:/var/lib/postgresql/data
     env_file:
       - db.env
     networks:
       - app-network
 
-  app:
+  api:
     volumes:
-      - data:/data
+      - dataprod:/data
     environment:
       - DEBUG=1
       - PRODUCTION=1
@@ -26,18 +26,29 @@ services:
     ports:
       - 9001:9001
     networks:
+      app-network:
+        aliases:
+          - api
+
+
+  proxy:
+    image: nginx:stable-alpine
+    volumes:
+      - ./nginx-test:/var/www/html
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 9000:9000
+    networks:
       - app-network
-        # aliases:
-        #   - api.local
 
 volumes:
-  dbprod:
+  # dbprod:
     # external: true
-  data:
+  dataprod:
     # external: true
   
 networks:
   app-network:
     # external: true
-    # driver: bridge
+    driver: bridge
     name: app-network

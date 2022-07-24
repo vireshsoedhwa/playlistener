@@ -11,8 +11,8 @@ RUN set -ex; \
         apt-get update; \
         apt-get install -y --no-install-recommends \
             build-essential \
+            ffmpeg \
             # curl \
-            # ffmpeg \
             # gcc \
             # nginx \
         ; \
@@ -28,7 +28,7 @@ COPY docker-entrypoint.sh /usr/local/bin
 # COPY /nginx/nginx.conf /etc/nginx/nginx.conf
 COPY playlistener playlistener
 # COPY frontend frontend
-COPY apiv1 apiv1
+COPY api api
 
 WORKDIR /code
 EXPOSE 9000

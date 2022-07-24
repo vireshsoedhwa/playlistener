@@ -44,7 +44,7 @@ class submitlink(APIView):
             if instance.download_finished is False:
                 # download not finished
                 if instance.busy is False:
-                    async_task('apiv1.task.get_video', instance, sync=False)
+                    async_task('api.task.get_video', instance, sync=False)
                     return JsonResponse(serializer.data, status=202)
                 # download not finished and is in progress
                 return JsonResponse(serializer.data, status=201)

@@ -2,10 +2,10 @@ from django.apps import AppConfig
 import os
 from django.conf import settings
 
-class Apiv1Config(AppConfig):
-    name = 'apiv1'
+class ApiConfig(AppConfig):
+    name = 'api'
 
     def ready(self):
         print("DEBUG: " + str(settings.DEBUG))
         print("PRODUCTION: " + str(settings.PRODUCTION))
-        print("apiv1 has started")
+        print("api has started")

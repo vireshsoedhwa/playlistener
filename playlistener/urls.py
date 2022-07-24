@@ -16,26 +16,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
-from apiv1 import views
-from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from api import views
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    path('api/', include('apiv1.urls')),
-    # path('', include('frontend.urls'))
+    path('api/', include('api.urls')),
 ]
 
 if settings.DEBUG:
-    # OPENAPI
-    # PATTERNS
-    # UI:
     urlpatterns += [
-        # path('api/', SpectacularSwaggerView.as_view(url_name='schema'),
-        #      name='swagger-ui'),
-        # path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
         path('admin/', admin.site.urls)
     ]
-# else:
-#     urlpatterns += [path('', views.RootPath.as_view(), name='root')]
+else:
+    urlpatterns += [path('', views.RootPath.as_view(), name='root')]
 
-# handler404 = 'apiv1.views.view_404'
+# handler404 = 'api.views.view_404'
