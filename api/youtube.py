@@ -2,6 +2,7 @@ import youtube_dl
 from .models import MediaResource
 from django.core.files.base import ContentFile
 from django.core.files import File
+from django.conf import settings
 
 import re
 
@@ -83,8 +84,9 @@ class YT:
 class MyLogger(object):
 
     def debug(self, msg):
-        print("DEBUG")
-        print(msg)
+        if settings.DEBUG:
+            print("DEBUG")
+            print(msg)
         pass
 
     def warning(self, msg):

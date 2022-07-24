@@ -13,7 +13,6 @@ services:
       - POSTGRES_USER=postgres
 
   api:
-    # image: playlistener-api
     build:
       context: .
     command: python manage.py runserver 0.0.0.0:9002
@@ -27,8 +26,6 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PORT=5432
       - DJANGO_SECRET_KEY='m925%@rztqnd=%6l9neo!h2w=ro_iaw-uryy!jlsdvrmnl-qie'
-    # env_file:
-    #   - db.env
     depends_on:
       - db
     ports:

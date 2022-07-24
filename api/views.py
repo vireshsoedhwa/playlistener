@@ -57,9 +57,6 @@ class submitlink(APIView):
         # return HttpResponse("", status=200)
         return JsonResponse(serializer.errors, status=400)
 
-# Create your views here.
-
-
 class getfile(APIView):
     serializer_class = MediaResource
 

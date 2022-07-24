@@ -30,7 +30,6 @@ COPY playlistener playlistener
 # COPY frontend frontend
 COPY api api
 
-WORKDIR /code
 EXPOSE 9000
 EXPOSE 9001
 
