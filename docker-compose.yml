@@ -5,6 +5,3 @@ services:
     image: playlistener-api
     build:
       context: .
-    # ports:
-    #   - "9000:9000"    
-   
