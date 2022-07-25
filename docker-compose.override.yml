@@ -4,8 +4,6 @@ services:
   db:
     image: postgres:alpine
     restart: always
-    volumes:
-      - devdata:/var/lib/postgresql/data
     environment:
       - POSTGRES_HOST=db
       - POSTGRES_PASSWORD=postgres
@@ -32,6 +30,3 @@ services:
       - "9000:9000"    
       - "9001:9001"
       - "9002:9002"
-    
-volumes:
-  devdata:

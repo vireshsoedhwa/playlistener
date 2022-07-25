@@ -1,14 +1,15 @@
 import youtube_dl
-from .models import MediaResource
+from .models import MediaResource, DownloadProgress
 from django.core.files.base import ContentFile
 from django.core.files import File
 from django.conf import settings
 
 import re
+import logging
+logger = logging.getLogger(__name__)
 
 
 class YT:
-
     def __init__(self, mediaobject):
         self.mediaobject = mediaobject
 
@@ -27,7 +28,7 @@ class YT:
             'progress_hooks': [self.my_hook],
             # 'download_archive': '/code/dl/archive',
             'download_archive':
-            '/code/dl/' + str(mediaobject.id) + '/archive',
+            settings.MEDIA_ROOT + str(mediaobject.id) + '/archive',
             'keepvideo': False,
             'cachedir': False,
             # 'forcetitle':
@@ -36,25 +37,29 @@ class YT:
             # '/code/dl/' + str(mediaobject.id),
             'restrictfilenames': True,
             # 'outtmpl': '/code/dl/%(id)s/%(title)s.%(ext)s',
-            'outtmpl': '/code/dl/' + str(mediaobject.id) + '/%(title)s.%(ext)s',
+            'outtmpl': settings.MEDIA_ROOT + str(mediaobject.id) + '/%(title)s.%(ext)s',
         }
+
+        self.downloadprogress = DownloadProgress.objects.create(
+            object=mediaobject)
+        self.downloadprogress.save()
 
     def my_hook(self, d):
         print(d['status'])
         if d['status'] == 'downloading':
-            # print('Downloadingg it ' + str(d['downloaded_bytes']) + "/" +
-            #       str(d['total_bytes']))
-            pass
+            progress = (d['downloaded_bytes']/d['total_bytes'])*100
+            self.downloadprogress.eta = d['eta']
+            self.downloadprogress.elapsed = d['elapsed']
+            self.downloadprogress.speed = d['speed']
+            self.downloadprogress.progress = progress
+            self.downloadprogress.save()
         if d['status'] == 'error':
-            print('Error happened')
+            self.mediaobject.download_finished = False
             self.mediaobject.busy = False
             self.mediaobject.save()
         if d['status'] == 'finished':
-            print('download finished')
-
             get_just_filename = re.search(r"(.*\/)([^\/]*)\.[a-zA-Z0-9]*",
                                           d['filename'])
-            # self.mediaobject.title = get_just_filename.group(2)
             self.mediaobject.audiofile.name = get_just_filename.group(
                 1) + get_just_filename.group(2) + ".mp3"
             self.mediaobject.download_finished = True
@@ -73,6 +78,13 @@ class YT:
                                        process=True,
                                        force_generic_extractor=False)
 
+            # check if genre is there
+            try:
+                self.mediaobject.genre = jsontry["genre"]
+                logger.info("genre found")
+            except:
+                logger.info("genre not available")
+
             self.mediaobject.title = jsontry["title"]
             self.mediaobject.description = jsontry["description"]
             self.mediaobject.download_finished = False
@@ -85,18 +97,15 @@ class MyLogger(object):
 
     def debug(self, msg):
         if settings.DEBUG:
-            print("DEBUG")
-            print(msg)
+            logger.info(msg)
         pass
 
     def warning(self, msg):
-        print("WARNING")
-        print(msg)
+        logger.warn(msg)
         pass
 
     def error(self, msg):
-        print("ERROR")
-        print(msg)
+        logger.error(msg)
 
 
 # for reference

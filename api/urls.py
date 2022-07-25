@@ -5,8 +5,10 @@ from . import views
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
-    path('submitlink', views.submitlink.as_view()),
-    path('getfile/<id>', views.getfile.as_view()),
+    path('submitlink', views.Submitlink.as_view()),
+    path('getfile/<int:id>', views.Getfile.as_view()),
+    path('list', views.List.as_view()),
+    path('test', views.view)
 ]
 
 if settings.DEBUG:

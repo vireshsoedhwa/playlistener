@@ -3,20 +3,18 @@ from django.core.files.storage import FileSystemStorage
 from django.db.models import Deferrable, UniqueConstraint
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from django.conf import settings
+
+from django_q.tasks import async_task, result, fetch
 
 import re
 
 
 def file_directory_path(instance, filename):
-    return '/code/dl/{0}/{1}'.format(instance.id, instance.filename)
-
-
-# def my_callback(sender, **kwargs):
-#     print("")
+    return ('{0}{1}/{2}').format(settings.MEDIA_ROOT, instance.id, instance.filename)
 
 
 class MediaResource(models.Model):
-    # id = models.TextField(primary_key=True, max_length=200, blank=True)
     id = models.AutoField(primary_key=True)
     youtube_id = models.TextField(unique=True, max_length=200, blank=True)
     title = models.TextField(max_length=500, null=True, blank=True)
@@ -25,18 +23,12 @@ class MediaResource(models.Model):
                                             blank=True,
                                             default=False)
     busy = models.BooleanField(null=True, blank=True, default=False)
-    # audiofile_converted = models.BooleanField(null=True,
-    #                                           blank=True,
-    #                                           default=False)
-    # status = models.TextField(max_length=200, null=True, blank=True)
-    # original_videofile = models.FileField(upload_to=file_directory_path,
-    #                                       null=True,
-    #                                       blank=True)
     audiofile = models.FileField(upload_to=file_directory_path,
                                  null=True,
                                  blank=True,
                                  max_length=500)
-
+    genre = models.TextField(max_length=100, null=True, blank=True)
+    artist = models.TextField(max_length=100, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     # class Meta:
@@ -45,34 +37,48 @@ class MediaResource(models.Model):
     def __str__(self):
         return str(self.id)
 
+# signal for updating
 
-# Available for the media that is a track or a part of a music album:
 
-# track (string): Title of the track
-# track_number (numeric): Number of the track within an album or a disc
-# track_id (string): Id of the track
-# artist (string): Artist(s) of the track
-# genre (string): Genre(s) of the track
-# album (string): Title of the album the track belongs to
-# album_type (string): Type of the album
-# album_artist (string): List of all artists appeared on the album
-# disc_number (numeric): Number of the disc or other physical medium the track belongs to
-# release_year (numeric): Year (YYYY) when the album was released
+@receiver(post_save, sender=MediaResource, dispatch_uid="update_urlslug")
+def checkdownload(sender, instance, created, raw, using, update_fields, **kwargs):
+    # print("TEEEEEEEST")
+    # print("sender " + str(sender))
+    # print("instance " + str(instance))
+    # print("created  " + str(created))
+    # print("raw " + str(raw))
+    # print("using " + str(using))
+    # print("update fields " + str(update_fields))
 
-# # class TransactionDetail(models.Model):
-# #     product = models.ForeignKey(Product)
+    if created:
+        if instance.download_finished is False:
+            if instance.busy is False:
+                async_task('api.task.get_video', instance, sync=False)
+    else:
+        pass
 
-# # # method for updating
-# # @receiver(post_save, sender=Video, dispatch_uid="update_urlslug")
-# # def update_urlid(sender, instance, **kwargs):
-# #     # instance.product.stock -= instance.amount
-# #     print("TEEEEEEEST")
-# #     post_save.disconnect(update_urlid, sender=Video)
-# #     instance.save()
-# #     post_save.connect(update_urlid, sender=Video)
 
-# # method for deleting
+# # signal for deleting
 @receiver(post_delete, sender=MediaResource, dispatch_uid="delete_yt_archive_record")
-def update_urlid(sender, instance, **kwargs):
+def delete_record(sender, instance, **kwargs):
 
     print(f"Deleted ID:{instance.id} with youtube id {instance.youtube_id}")
+
+
+class DownloadProgress(models.Model):
+    object = models.OneToOneField(
+        MediaResource,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+    progress = models.DecimalField(max_digits=3, decimal_places=0, blank=True,
+                                   default=False)
+    eta = models.DecimalField(max_digits=5, decimal_places=0, blank=True,
+                              default=False)
+    elapsed = models.DecimalField(max_digits=5, decimal_places=0, blank=True,
+                                  default=False)
+    speed = models.DecimalField(max_digits=10, decimal_places=0, blank=True,
+                                default=False)
+
+    # def __str__(self):
+    #     return str(object.id) + " : " + str(self.progress)

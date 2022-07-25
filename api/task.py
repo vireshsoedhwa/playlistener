@@ -1,16 +1,21 @@
 # import youtube_dl 
 import time
-# from .models import MediaResource
+# from .models import DownloadProgress
 from django.core.files.base import ContentFile
 from django.core.files import File
 
 from .youtube import YT
+import time
 
 def get_video(media):
 
     newmedia = YT(media)
     newmedia.run()
 
+# def test_task():
+#     time.sleep(10)
+
+#     return "task fucntioniinsns"
     # try:
     #     newdownload = YT(vidobject.urlid, vidobject)
     #     newdownload.run()

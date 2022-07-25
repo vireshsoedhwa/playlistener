@@ -13,7 +13,7 @@ services:
 
   api:
     volumes:
-      - dataprod:/code/dl
+      - dataprod:/code/data
     environment:
       - DEBUG=0
       - PRODUCTION=1
