@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from django.core.validators import URLValidator
-from .models import MediaResource
+from .models import MediaResource, YoutubeMediaResource
 from django.db import IntegrityError
 import re
 
@@ -27,26 +27,26 @@ class SubmitLinkSerializer(serializers.Serializer):
         max_length=200,
         min_length=None,
         allow_blank=False)
-    title = serializers.CharField(
-        max_length=500,
-        min_length=None,
-        allow_blank=True)
-    genre = serializers.CharField(
-        max_length=100,
-        min_length=None,
-        allow_blank=True)
+    # title = serializers.CharField(
+    #     max_length=500,
+    #     min_length=None,
+    #     allow_blank=True)
+    # genre = serializers.CharField(
+    #     max_length=100,
+    #     min_length=None,
+    #     allow_blank=True)
 
     def create(self, validated_data):
         print("creationnn")
-        return MediaResource.objects.create(**validated_data)
+        return YoutubeMediaResource.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         # instance.url = validated_data.get('url', instance.url)
         # instance.save()
-        instance.youtube_id = validated_data.get(
-            'youtube_id', instance.youtube_id)
-        instance.title = validated_data.get('title', instance.title)
-        instance.genre = validated_data.get('genre', instance.genre)
+        # instance.youtube_id = validated_data.get(
+        #     'youtube_id', instance.youtube_id)
+        # instance.title = validated_data.get('title', instance.title)
+        # instance.genre = validated_data.get('genre', instance.genre)
         print("updatinnnggg")
         instance.save()
         return instance

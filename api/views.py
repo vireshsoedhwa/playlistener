@@ -13,7 +13,7 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExampl
 # from drf_spectacular.types import OpenApiTypes
 from .serializers import SubmitLinkSerializer, GetfileSerializer, ListSerializer, ListRequestSerializer
 
-from .models import MediaResource
+from .models import MediaResource, YoutubeMediaResource
 from .youtube import YT
 
 from django_q.tasks import async_task, result, fetch
@@ -29,14 +29,14 @@ from api import serializers
 logger = logging.getLogger(__name__)
 
 
-class OncePerDayUserThrottle(UserRateThrottle):
-    rate = '5/day'
+# class OncePerDayUserThrottle(UserRateThrottle):
+#     rate = '5/day'
 
 
-@api_view(['GET'])
-@throttle_classes([OncePerDayUserThrottle])
-def view(request):
-    return Response({"message": "Hello for today! See you tomorrow!"})
+# @api_view(['GET'])
+# @throttle_classes([OncePerDayUserThrottle])
+# def view(request):
+#     return Response({"message": "Hello for today! See you tomorrow!"})
 
 
 class Submitlink(APIView):
@@ -60,11 +60,10 @@ class Submitlink(APIView):
             raise Http404
 
     def get_object(self, youtube_id):
-        try:
-            print("existing one")
-            return MediaResource.objects.get(youtube_id=youtube_id)
-        except MediaResource.DoesNotExist:
-            print("new one")
+        try:            
+            youtube_media_resource = YoutubeMediaResource.objects.get(youtube_id=youtube_id)
+            return youtube_media_resource
+        except YoutubeMediaResource.DoesNotExist:
             return None
 
     def put(self, request):
@@ -72,10 +71,8 @@ class Submitlink(APIView):
         if url:
             youtube_id = self.sanitize_url(url)
             print(youtube_id)
-            existing_object = self.get_object(youtube_id)
-            print(existing_object)
-            print(request.query_params)
 
+            existing_object = self.get_object(youtube_id)
             query_dict = request.query_params.copy()
             query_dict['youtube_id'] = youtube_id
 
@@ -83,15 +80,15 @@ class Submitlink(APIView):
             serializer = SubmitLinkSerializer(
                 existing_object, data=query_dict, partial=True)
 
-            # print("yeah")
             if serializer.is_valid():
-                instance = serializer.save()
-                # return Response("BLABLA")
-
+                print("what is this")
+                serializer.save()
                 return Response(serializer.data)
+
             return Response(serializer.errors, status=400)
 
         return Response("no url provided", status=400)
+
 
 class Getfile(APIView):
     serializer_class = GetfileSerializer

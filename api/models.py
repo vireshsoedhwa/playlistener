@@ -16,13 +16,8 @@ def file_directory_path(instance, filename):
 
 class MediaResource(models.Model):
     id = models.AutoField(primary_key=True)
-    youtube_id = models.TextField(unique=True, max_length=200, blank=True)
     title = models.TextField(max_length=500, null=True, blank=True)
     description = models.TextField(max_length=5000, null=True, blank=True)
-    download_finished = models.BooleanField(null=True,
-                                            blank=True,
-                                            default=False)
-    busy = models.BooleanField(null=True, blank=True, default=False)
     audiofile = models.FileField(upload_to=file_directory_path,
                                  null=True,
                                  blank=True,
@@ -35,50 +30,46 @@ class MediaResource(models.Model):
     #     constraints = [UniqueConstraint(fields=['id'], name="vid-id")]
 
     def __str__(self):
-        return str(self.id)
+        return str(self.id) + " : " + str(self.title)
 
 # signal for updating
-
-
-@receiver(post_save, sender=MediaResource, dispatch_uid="update_urlslug")
-def checkdownload(sender, instance, created, raw, using, update_fields, **kwargs):
-    # print("TEEEEEEEST")
-    # print("sender " + str(sender))
-    # print("instance " + str(instance))
-    # print("created  " + str(created))
-    # print("raw " + str(raw))
-    # print("using " + str(using))
-    # print("update fields " + str(update_fields))
-
-    if created:
-        if instance.download_finished is False:
-            if instance.busy is False:
-                async_task('api.task.get_video', instance, sync=False)
-    else:
-        pass
-
 
 # # signal for deleting
 @receiver(post_delete, sender=MediaResource, dispatch_uid="delete_yt_archive_record")
 def delete_record(sender, instance, **kwargs):
 
-    print(f"Deleted ID:{instance.id} with youtube id {instance.youtube_id}")
+    print(f"Deleted ID:{instance.id}")
 
-
-class DownloadProgress(models.Model):
-    object = models.OneToOneField(
+class YoutubeMediaResource(models.Model):
+    youtube_id = models.TextField(primary_key=True, max_length=200)
+    mediaresource = models.OneToOneField(
         MediaResource,
         on_delete=models.CASCADE,
-        primary_key=True,
+        blank=True,
+        null=True
     )
-    progress = models.DecimalField(max_digits=3, decimal_places=0, blank=True,
-                                   default=False)
+    download_finished = models.BooleanField(null=True,
+                                            blank=True,
+                                            default=False)
+    busy = models.BooleanField(null=True, blank=True, default=False)
+    downloadprogress = models.DecimalField(max_digits=3, decimal_places=0, blank=True,
+                                   default=0)
     eta = models.DecimalField(max_digits=5, decimal_places=0, blank=True,
-                              default=False)
+                              default=0)
     elapsed = models.DecimalField(max_digits=5, decimal_places=0, blank=True,
-                                  default=False)
+                                  default=0)
     speed = models.DecimalField(max_digits=10, decimal_places=0, blank=True,
-                                default=False)
+                                default=0)
 
-    # def __str__(self):
-    #     return str(object.id) + " : " + str(self.progress)
+@receiver(post_save, sender=YoutubeMediaResource, dispatch_uid="create_mediaresource")
+def checkdownload(sender, instance, created, raw, using, update_fields, **kwargs):
+    if created:
+        mediaresource = MediaResource.objects.create()
+        mediaresource.save()
+        instance.mediaresource = mediaresource
+        instance.save()
+        if instance.download_finished is False:
+            if instance.busy is False:
+                async_task('api.task.get_video', mediaresource, sync=False)
+    else:
+        pass
