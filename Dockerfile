@@ -12,6 +12,8 @@ RUN set -ex; \
         apt-get install -y --no-install-recommends \
             build-essential \
             ffmpeg \
+            gdal-bin \
+            libmagic1 \
             # curl \
             # gcc \
             # nginx \

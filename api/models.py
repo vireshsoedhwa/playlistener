@@ -11,7 +11,8 @@ import re
 
 
 def file_directory_path(instance, filename):
-    return ('{0}{1}/{2}').format(settings.MEDIA_ROOT, instance.id, instance.filename)
+
+    return ('{0}/{1}').format(instance.id, filename)
 
 
 class MediaResource(models.Model):
@@ -22,12 +23,13 @@ class MediaResource(models.Model):
                                  null=True,
                                  blank=True,
                                  max_length=500)
+    audiofile_432 = models.FileField(upload_to=file_directory_path,
+                                 null=True,
+                                 blank=True,
+                                 max_length=500)
     genre = models.TextField(max_length=100, null=True, blank=True)
     artist = models.TextField(max_length=100, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    # class Meta:
-    #     constraints = [UniqueConstraint(fields=['id'], name="vid-id")]
 
     def __str__(self):
         return str(self.id) + " : " + str(self.title)
@@ -44,6 +46,7 @@ class YoutubeMediaResource(models.Model):
     youtube_id = models.TextField(primary_key=True, max_length=200)
     mediaresource = models.OneToOneField(
         MediaResource,
+        related_name='youtube_data',
         on_delete=models.CASCADE,
         blank=True,
         null=True

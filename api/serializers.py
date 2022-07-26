@@ -1,11 +1,11 @@
+from logging.config import valid_ident
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from django.core.validators import URLValidator
 from .models import MediaResource, YoutubeMediaResource
 from django.db import IntegrityError
 import re
-
-from django_q.tasks import async_task, result, fetch
+import magic
 
 import logging
 logger = logging.getLogger(__name__)
@@ -19,6 +19,17 @@ logger = logging.getLogger(__name__)
 #     if x == None:
 #         raise serializers.ValidationError("Not a Valid youtube URL: " + value)
 
+# def validate_audiofile(value):
+
+#     content_type = magic.from_buffer(data.read(), mime=True)
+#             data.seek(0)
+
+    # if content_type not in self.content_types:
+    #     params = { 'content_type': content_type }
+    #     raise ValidationError(self.error_messages['content_type'],
+    #                         'content_type', params)
+
+
 
 class SubmitLinkSerializer(serializers.Serializer):
 
@@ -27,27 +38,11 @@ class SubmitLinkSerializer(serializers.Serializer):
         max_length=200,
         min_length=None,
         allow_blank=False)
-    # title = serializers.CharField(
-    #     max_length=500,
-    #     min_length=None,
-    #     allow_blank=True)
-    # genre = serializers.CharField(
-    #     max_length=100,
-    #     min_length=None,
-    #     allow_blank=True)
 
     def create(self, validated_data):
-        print("creationnn")
         return YoutubeMediaResource.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        # instance.url = validated_data.get('url', instance.url)
-        # instance.save()
-        # instance.youtube_id = validated_data.get(
-        #     'youtube_id', instance.youtube_id)
-        # instance.title = validated_data.get('title', instance.title)
-        # instance.genre = validated_data.get('genre', instance.genre)
-        print("updatinnnggg")
         instance.save()
         return instance
 
@@ -55,13 +50,33 @@ class SubmitLinkSerializer(serializers.Serializer):
 class GetfileSerializer(serializers.Serializer):
     id = serializers.IntegerField(max_value=None, min_value=None)
 
+class YoutubeMediaResourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = YoutubeMediaResource
+        fields = ['youtube_id', 'download_finished', 'busy', 'downloadprogress', 'eta', 'elapsed', 'speed']
 
-class ListRequestSerializer(serializers.Serializer):
-    count = serializers.IntegerField(max_value=None, min_value=None)
+class MediaResourceSerializer(serializers.ModelSerializer):
+    youtube_data = YoutubeMediaResourceSerializer(many=False, read_only=True)
 
+    audiofile = serializers.FileField(max_length=None, allow_empty_file=False, use_url=False)
+    # title = models.TextField(max_length=500, null=True, blank=True)
+    # description = models.TextField(max_length=5000, null=True, blank=True)
+    # genre = models.TextField(max_length=100, null=True, blank=True)
+    # artist = models.TextField(max_length=100, null=True, blank=True)
 
-class ListSerializer(serializers.ModelSerializer):
     class Meta:
         model = MediaResource
-        fields = ['id', 'youtube_id', 'title', 'genre',
-                  'download_finished', 'busy', 'created_at']
+        fields = ['id', 'title', 'genre','audiofile', 'youtube_data', 'created_at']
+
+    def create(self, validated_data):
+        newaudio = MediaResource.objects.create()
+        newaudio.save()
+        newaudio.audiofile = validated_data.get('audiofile', newaudio.audiofile)
+        newaudio.save()
+        return newaudio
+    
+    def validate_audiofile(self, value):
+        typeoffile = magic.from_file(value.temporary_file_path(), mime=True)
+        if 'audio/mpeg' not in typeoffile:
+            raise serializers.ValidationError(value.name + " is not a valid MP3")
+        return value

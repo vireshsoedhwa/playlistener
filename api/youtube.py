@@ -43,28 +43,28 @@ class YT:
     def my_hook(self, d):
         if d['status'] == 'downloading':
             progress = (d['downloaded_bytes']/d['total_bytes'])*100
-            self.mediaobject.youtubemediaresource.eta = d['eta']
-            self.mediaobject.youtubemediaresource.elapsed = d['elapsed']
-            self.mediaobject.youtubemediaresource.speed = d['speed']
-            self.mediaobject.youtubemediaresource.downloadprogress = progress
-            self.mediaobject.youtubemediaresource.save()
+            self.mediaobject.youtube_data.eta = d['eta']
+            self.mediaobject.youtube_data.elapsed = d['elapsed']
+            self.mediaobject.youtube_data.speed = d['speed']
+            self.mediaobject.youtube_data.downloadprogress = progress
+            self.mediaobject.youtube_data.save()
         if d['status'] == 'error':
-            self.mediaobject.youtubemediaresource.download_finished = False
-            self.mediaobject.youtubemediaresource.busy = False
-            self.mediaobject.youtubemediaresource.save()
+            self.mediaobject.youtube_data.download_finished = False
+            self.mediaobject.youtube_data.busy = False
+            self.mediaobject.youtube_data.save()
         if d['status'] == 'finished':
             get_just_filename = re.search(r"(.*\/)([^\/]*)\.[a-zA-Z0-9]*",
                                           d['filename'])
             self.mediaobject.audiofile.name = get_just_filename.group(
                 1) + get_just_filename.group(2) + ".mp3"
-            self.mediaobject.youtubemediaresource.download_finished = True
-            self.mediaobject.youtubemediaresource.busy = False
-            self.mediaobject.youtubemediaresource.save()
+            self.mediaobject.youtube_data.download_finished = True
+            self.mediaobject.youtube_data.busy = False
+            self.mediaobject.youtube_data.save()
             self.mediaobject.save()
 
     def run(self):
         youtube_target_url = "https://youtube.com/watch?v=" + \
-            str(self.mediaobject.youtubemediaresource.youtube_id)
+            str(self.mediaobject.youtube_data.youtube_id)
 
         with youtube_dl.YoutubeDL(self.ydl_opts) as ydl:
             jsontry = ydl.extract_info(youtube_target_url,

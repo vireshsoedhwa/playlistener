@@ -1,3 +1,4 @@
+from email.mime import audio
 import re
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -8,49 +9,67 @@ from django.http import HttpResponse, JsonResponse, FileResponse
 # from django.core.files import File
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 # from drf_spectacular.types import OpenApiTypes
-from .serializers import SubmitLinkSerializer, GetfileSerializer, ListSerializer, ListRequestSerializer
+from .serializers import SubmitLinkSerializer, GetfileSerializer, MediaResourceSerializer
 
 from .models import MediaResource, YoutubeMediaResource
 from .youtube import YT
 
 from django_q.tasks import async_task, result, fetch
+# from django.core.exceptions import ObjectDoesNotExist
 
-from rest_framework.decorators import api_view, throttle_classes
-from rest_framework.throttling import UserRateThrottle
+# from rest_framework.decorators import api_view, throttle_classes
+# from rest_framework.throttling import UserRateThrottle
 from django.http import Http404, QueryDict
 
-# import requests
+
+from django.shortcuts import get_object_or_404
+from rest_framework import viewsets
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework import renderers
+
 import logging
 
 from api import serializers
 logger = logging.getLogger(__name__)
 
 
-# class OncePerDayUserThrottle(UserRateThrottle):
-#     rate = '5/day'
+class MediaResourceViewSet(viewsets.ModelViewSet):
+    queryset = MediaResource.objects.all()
+    serializer_class = MediaResourceSerializer
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
 
+    def list(self, request):
+        show = None
+        if "show" in request.query_params:
+            show = int(request.query_params['show'])
+        recent = MediaResource.objects.all().order_by('-created_at')[:show]
+        serializer = self.get_serializer(recent, many=True)
+        return Response(serializer.data)
 
-# @api_view(['GET'])
-# @throttle_classes([OncePerDayUserThrottle])
-# def view(request):
-#     return Response({"message": "Hello for today! See you tomorrow!"})
+    def create(self, request):      
+    
+        validlist = []
+        for audiofile in request.data.getlist('audiofile'):
+            mediaresource_serializer = self.get_serializer(data={'audiofile':audiofile})
+            if mediaresource_serializer.is_valid():
+                mediaresource_serializer.save()
+                validlist.append(str(audiofile))
+            else:
+                validlist.append(mediaresource_serializer.errors)
+        return Response(validlist)
 
+    @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
+    def focus(self, request, *args, **kwargs):
+        mediaresource = self.get_object()
+        return Response(mediaresource.id)
 
 class Submitlink(APIView):
-    # serializer_class = SubmitLinkSerializer
-
-    # @extend_schema(request=SubmitLinkSerializer,
-    #                parameters=[
-    #                    OpenApiParameter(name='url',
-    #                                     description='Youtube Url',
-    #                                     required=True,
-    #                                     type=str),
-    #                ])
     def sanitize_url(self, url):
-        # return Response("get")
         try:
             regExp = ".*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*"
             x = re.search(regExp, url)
@@ -60,8 +79,9 @@ class Submitlink(APIView):
             raise Http404
 
     def get_object(self, youtube_id):
-        try:            
-            youtube_media_resource = YoutubeMediaResource.objects.get(youtube_id=youtube_id)
+        try:
+            youtube_media_resource = YoutubeMediaResource.objects.get(
+                youtube_id=youtube_id)
             return youtube_media_resource
         except YoutubeMediaResource.DoesNotExist:
             return None
@@ -97,42 +117,58 @@ class Getfile(APIView):
         request=MediaResource
     )
     def get(self, request, id, format=None):
-        try:
-            instance = MediaResource.objects.get(id=id)
 
-            if instance.audiofile is None:
-                return JsonResponse({'id': id, 'download_finished': instance.download_finished, 'busy': instance.busy}, status=404)
+        serializer = GetfileSerializer(data={'id': id})
 
-            filename = 'download'
-            if instance.title is None:
-                filename = instance.audiofile.name
-            else:
-                filename = instance.title
-
-            file_response = FileResponse(instance.audiofile)
-            file_response[
-                'Content-Disposition'] = 'attachment; filename="' + filename
-            return file_response
-        except:
-            return JsonResponse({'id': id}, status=404)
-
-
-class List(APIView):
-    def get(self, request, format=None):
-        if "count" in request.query_params:
-            serializer = ListRequestSerializer(
-                data={'count': request.query_params['count']})
-            if serializer.is_valid():
-                return querysetresponse(serializer.validated_data['count'])
-        return querysetresponse(0)
+        if serializer.is_valid():
+            try:
+                instance = MediaResource.objects.get(pk=id)
+                if instance.audiofile:
+                    filename = 'download'
+                    if instance.title is None:
+                        filename = instance.audiofile.name
+                    else:
+                        filename = instance.title
+                    file_response = FileResponse(instance.audiofile)
+                    file_response[
+                        'Content-Disposition'] = 'attachment; filename="' + filename
+                    return file_response
+                else:
+                    return JsonResponse({'id': id, 'download_finished': instance.youtube_data.download_finished, 'busy': instance.youtube_data.busy}, status=404)
+            except MediaResource.DoesNotExist:
+                return Response(str(id)+' does not exist', status=404)
+        return JsonResponse(serializer.errors, status=400)
 
 
-def querysetresponse(count):
-    if count == 0:
-        count = None
-    queryset = MediaResource.objects.all()[:count]
-    listserializer = ListSerializer(queryset, many=True)
-    return Response(listserializer.data)
+# class List(APIView):
+#     def get(self, request, format=None):
+#         if "count" in request.query_params:
+#             serializer = ListRequestSerializer(
+#                 data={'count': request.query_params['count']})
+#             if serializer.is_valid():
+#                 return self.querysetresponse(serializer.validated_data['count'])
+#         return self.querysetresponse(0)
+
+#     def querysetresponse(self, count):
+#         if count == 0:
+#             count = None
+#         queryset = MediaResource.objects.all()[:count]
+#         listserializer = MediaResourceSerializer(queryset, many=True)
+#         return Response(listserializer.data)
+
+
+# views.py
+class FileUploadView(APIView):
+    parser_classes = [MultiPartParser]
+
+    def put(self, request, filename, format=None):
+        file_obj = request.data['file']
+        # ...
+        # do some stuff with uploaded file
+        # ...
+        return Response(status=204)
+
+
 
 
 class RootPath(APIView):
@@ -142,14 +178,11 @@ class RootPath(APIView):
                             json_dumps_params={'indent': 2},
                             status=200)
 
-
 def view_404(request, exception=None):
     return redirect('/')
 
-
 def redirect_view(request, namespace, name, slug, actualurl):
     return redirect('/' + actualurl)
-
 
 def redirect_root(request, namespace, name, slug):
     return redirect('/')
