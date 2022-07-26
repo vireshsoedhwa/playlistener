@@ -3,14 +3,24 @@ import time
 # from .models import DownloadProgress
 from django.core.files.base import ContentFile
 from django.core.files import File
-
+from django.conf import settings
 from .youtube import YT
 import time
+import os
+
+import logging
+logger = logging.getLogger(__name__)
 
 def get_video(media):
 
     newmedia = YT(media)
     newmedia.run()
+
+    # delete archive file that youtube dl creates
+    if os.path.exists(settings.MEDIA_ROOT + str(media.id) + '/archive'):
+        os.remove(settings.MEDIA_ROOT +
+                    str(media.id) + '/archive')
+        logger.info("deleting yt archive file")
 
 # def test_task():
 #     time.sleep(10)

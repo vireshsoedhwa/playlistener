@@ -34,9 +34,7 @@ class MediaResource(models.Model):
     def __str__(self):
         return str(self.id) + " : " + str(self.title)
 
-# signal for updating
-
-# # signal for deleting
+# signal for deleting
 @receiver(post_delete, sender=MediaResource, dispatch_uid="delete_yt_archive_record")
 def delete_record(sender, instance, **kwargs):
 
@@ -51,6 +49,7 @@ class YoutubeMediaResource(models.Model):
         blank=True,
         null=True
     )
+    error = models.TextField(max_length=500)
     download_finished = models.BooleanField(null=True,
                                             blank=True,
                                             default=False)
@@ -76,3 +75,4 @@ def checkdownload(sender, instance, created, raw, using, update_fields, **kwargs
                 async_task('api.task.get_video', mediaresource, sync=False)
     else:
         pass
+        # TODO retry download here on user request

@@ -13,7 +13,7 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 # from drf_spectacular.types import OpenApiTypes
-from .serializers import SubmitLinkSerializer, GetfileSerializer, MediaResourceSerializer
+from .serializers import SubmitLinkSerializer, GetfileSerializer, MediaResourceSerializer, YoutubeMediaResourceSerializer
 
 from .models import MediaResource, YoutubeMediaResource
 from .youtube import YT
@@ -51,11 +51,11 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(recent, many=True)
         return Response(serializer.data)
 
-    def create(self, request):      
-    
+    def create(self, request):
         validlist = []
         for audiofile in request.data.getlist('audiofile'):
-            mediaresource_serializer = self.get_serializer(data={'audiofile':audiofile})
+            mediaresource_serializer = self.get_serializer(
+                data={'audiofile': audiofile})
             if mediaresource_serializer.is_valid():
                 mediaresource_serializer.save()
                 validlist.append(str(audiofile))
@@ -67,6 +67,23 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
     def focus(self, request, *args, **kwargs):
         mediaresource = self.get_object()
         return Response(mediaresource.id)
+
+
+class YoutubeMediaResourceViewSet(viewsets.ModelViewSet):
+    queryset = YoutubeMediaResource.objects.all()
+    serializer_class = YoutubeMediaResourceSerializer
+
+    def create(self, request):
+        
+        youtube_media_resource_serializer = self.get_serializer(
+            data=request.data)
+
+        if youtube_media_resource_serializer.is_valid(raise_exception=True):
+            youtube_media_resource_serializer.save()
+            return Response(youtube_media_resource_serializer.data)
+
+        return Response(youtube_media_resource_serializer.errors)
+
 
 class Submitlink(APIView):
     def sanitize_url(self, url):
@@ -90,23 +107,16 @@ class Submitlink(APIView):
         url = request.query_params.get("youtube_id", None)
         if url:
             youtube_id = self.sanitize_url(url)
-            print(youtube_id)
-
             existing_object = self.get_object(youtube_id)
             query_dict = request.query_params.copy()
             query_dict['youtube_id'] = youtube_id
-
-            print(query_dict)
             serializer = SubmitLinkSerializer(
                 existing_object, data=query_dict, partial=True)
 
             if serializer.is_valid():
-                print("what is this")
                 serializer.save()
                 return Response(serializer.data)
-
             return Response(serializer.errors, status=400)
-
         return Response("no url provided", status=400)
 
 
@@ -169,8 +179,6 @@ class FileUploadView(APIView):
         return Response(status=204)
 
 
-
-
 class RootPath(APIView):
     # permission_classes = [AllowAny]
     def get(self, request, format=None):
@@ -178,11 +186,14 @@ class RootPath(APIView):
                             json_dumps_params={'indent': 2},
                             status=200)
 
+
 def view_404(request, exception=None):
     return redirect('/')
 
+
 def redirect_view(request, namespace, name, slug, actualurl):
     return redirect('/' + actualurl)
+
 
 def redirect_root(request, namespace, name, slug):
     return redirect('/')

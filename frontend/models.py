@@ -10,11 +10,6 @@ import re
 def file_directory_path(instance, filename):
     return '/code/dl/{0}/{1}'.format(instance.id, instance.filename)
 
-
-def my_callback(sender, **kwargs):
-    print("")
-
-
 class Resource(models.Model):
     id = models.TextField(primary_key=True, max_length=200, blank=True)
     title = models.TextField(max_length=200, null=True, blank=True)
@@ -52,7 +47,6 @@ class Resource(models.Model):
 # @receiver(post_save, sender=Video, dispatch_uid="update_urlslug")
 # def update_urlid(sender, instance, **kwargs):
 #     # instance.product.stock -= instance.amount
-#     print("TEEEEEEEST")
 #     post_save.disconnect(update_urlid, sender=Video)
 #     instance.save()
 #     post_save.connect(update_urlid, sender=Video)

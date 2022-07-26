@@ -1,7 +1,7 @@
 from django.urls import path, include
 from django.conf import settings
 from . import views
-from .views import MediaResourceViewSet
+from .views import MediaResourceViewSet, YoutubeMediaResourceViewSet
 from rest_framework.routers import DefaultRouter
 
 # from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
@@ -23,6 +23,9 @@ router = DefaultRouter()
 
 router.register(r'mediaresources', MediaResourceViewSet,
                 basename="mediaresources")
+
+router.register(r'youtube', YoutubeMediaResourceViewSet,
+                basename="youtubemediaresources")
 
 urlpatterns += [
     path('', include(router.urls)),

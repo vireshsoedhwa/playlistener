@@ -86,8 +86,12 @@ class YT:
             self.mediaobject.download_finished = False
             self.mediaobject.busy = True
             self.mediaobject.save()
-            ydl.download([youtube_target_url])
 
+            try:
+                ydl.download([youtube_target_url])
+            except Exception as e:
+                self.mediaobject.error = e
+                self.mediaobject.save()
 
 class MyLogger(object):
 
