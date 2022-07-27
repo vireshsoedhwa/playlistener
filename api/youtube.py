@@ -26,7 +26,6 @@ class YT:
             'logger':
             MyLogger(),
             'progress_hooks': [self.my_hook],
-            # 'download_archive': '/code/dl/archive',
             'download_archive':
             settings.MEDIA_ROOT + str(mediaobject.id) + '/archive',
             'keepvideo': False,
@@ -36,7 +35,6 @@ class YT:
             # 'writeinfojson':
             # '/code/dl/' + str(mediaobject.id),
             'restrictfilenames': True,
-            # 'outtmpl': '/code/dl/%(id)s/%(title)s.%(ext)s',
             'outtmpl': settings.MEDIA_ROOT + str(mediaobject.id) + '/%(title)s.%(ext)s',
         }
 

@@ -6,7 +6,8 @@ from .models import MediaResource, YoutubeMediaResource
 from django.db import IntegrityError
 import re
 import magic
-import hashlib
+from .helper import create_hash
+from django.core.files import File
 
 import logging
 logger = logging.getLogger(__name__)
@@ -84,7 +85,8 @@ class MediaResourceSerializer(serializers.ModelSerializer):
         if 'audio/mpeg' not in typeoffile:
             raise serializers.ValidationError(
                 tempaudiofile_object.name + " is not a valid MP3")
-        md5, sha1 = create_hash(tempaudiofile_object)
+
+        md5 = create_hash(tempaudiofile_object.temporary_file_path())
         if MediaResource.objects.filter(md5_generated=md5).exists():
             raise serializers.ValidationError(
                 tempaudiofile_object.name + " is already recorded")
@@ -106,29 +108,3 @@ class MediaResourceSerializer(serializers.ModelSerializer):
         newaudio.save()
 
         return newaudio
-
-    # def validate_audiofile(self, value):
-    #     typeoffile = magic.from_file(value.temporary_file_path(), mime=True)
-    #     if 'audio/mpeg' not in typeoffile:
-    #         raise serializers.ValidationError(
-    #             value.name + " is not a valid MP3")
-    #     md5, sha1 = create_hash(value)
-    #     print(f"{md5}")
-    #     print(MediaResource.objects.filter(md5_generated=md5))
-    #     if MediaResource.objects.filter(md5_generated=md5).exists():
-    #         raise serializers.ValidationError(
-    #             value.name + " is already recorded")
-    #     return value
-
-
-def create_hash(file):
-    BUF_SIZE = 65536  # lets read stuff in 64kb chunks!
-
-    md5 = hashlib.md5()
-    sha1 = hashlib.sha1()
-
-    for chunk in file.chunks(chunk_size=BUF_SIZE):
-        md5.update(chunk)
-        sha1.update(chunk)
-
-    return md5.hexdigest(), sha1.hexdigest()
