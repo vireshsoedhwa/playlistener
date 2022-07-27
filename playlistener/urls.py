@@ -20,7 +20,7 @@ from api import views
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),
+    path('', include('api.urls')),
 ]
 
 if settings.DEBUG:

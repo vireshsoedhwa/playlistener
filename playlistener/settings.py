@@ -45,11 +45,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'django_q',
-    'drf_spectacular',
     'channels',
-    
     'api'
-    # 'frontend'
 ]
 
 MIDDLEWARE = [
@@ -185,15 +182,9 @@ Q_CLUSTER = {
 }
 
 REST_FRAMEWORK = {
-    # YOUR SETTINGS
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-}
-
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'Your Project API',
-    'DESCRIPTION': 'Your project description',
-    'VERSION': '0.0.0',
-    # OTHER SETTINGS
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
 }
 
 LOGGING = {
