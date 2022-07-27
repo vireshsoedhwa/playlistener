@@ -7,4 +7,4 @@ __pycache__
 
 migrations
 data
-.env
+prod.env
