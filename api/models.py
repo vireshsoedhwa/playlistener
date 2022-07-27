@@ -27,6 +27,8 @@ class MediaResource(models.Model):
                                  null=True,
                                  blank=True,
                                  max_length=500)
+    md5_generated = models.TextField(max_length=32, null=True, blank=True)
+    sha1_generated = models.TextField(max_length=40, null=True, blank=True)
     genre = models.TextField(max_length=100, null=True, blank=True)
     artist = models.TextField(max_length=100, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

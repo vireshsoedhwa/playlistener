@@ -6,6 +6,7 @@ from .models import MediaResource, YoutubeMediaResource
 from django.db import IntegrityError
 import re
 import magic
+import hashlib
 
 import logging
 logger = logging.getLogger(__name__)
@@ -31,25 +32,6 @@ class GetfileSerializer(serializers.Serializer):
     id = serializers.IntegerField(max_value=None, min_value=None)
 
 
-# class YoutubeIdValidator:
-#     def __init__(self):
-#         pass
-
-#     def __call__(self, value):
-#         regExp = ".*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*"
-#         x = re.search(regExp, value)
-#     #     # http://img.youtube.com/vi/[video-id]/[thumbnail-number].jpg
-
-#         if x == None:
-#             raise serializers.ValidationError(
-#                 f"[{value}] is not a valid youtube URL")
-#         print(x.group(2))
-
-#         # if value % self.base != 0:
-#         #     message = 'This field must be a multiple of %d.' % self.base
-#         #     raise serializers.ValidationError(message)
-
-
 class YoutubeMediaResourceSerializer(serializers.ModelSerializer):
 
     youtube_id = serializers.CharField(
@@ -73,11 +55,10 @@ class YoutubeMediaResourceSerializer(serializers.ModelSerializer):
         if x == None:
             raise serializers.ValidationError(
                 f"[{value}] is not a valid youtube URL")
-    
-        if YoutubeMediaResource.objects.filter(youtube_id = x.group(2)).exists():
+
+        if YoutubeMediaResource.objects.filter(youtube_id=x.group(2)).exists():
             raise serializers.ValidationError(
                 f"[{value}] has already been recorded")
-
         return x.group(2)
 
 
@@ -86,10 +67,29 @@ class MediaResourceSerializer(serializers.ModelSerializer):
 
     audiofile = serializers.FileField(
         max_length=None, allow_empty_file=False, use_url=False)
-    # title = models.TextField(max_length=500, null=True, blank=True)
+    # title = serializers.CharField(
+    #     max_length=500,
+    #     min_length=None,
+    #     allow_blank=True)
+
     # description = models.TextField(max_length=5000, null=True, blank=True)
     # genre = models.TextField(max_length=100, null=True, blank=True)
     # artist = models.TextField(max_length=100, null=True, blank=True)
+
+    def validate(self, attrs):
+        tempaudiofile_object = attrs.get(
+            'audiofile')
+        typeoffile = magic.from_file(
+            tempaudiofile_object.temporary_file_path(), mime=True)
+        if 'audio/mpeg' not in typeoffile:
+            raise serializers.ValidationError(
+                tempaudiofile_object.name + " is not a valid MP3")
+        md5, sha1 = create_hash(tempaudiofile_object)
+        if MediaResource.objects.filter(md5_generated=md5).exists():
+            raise serializers.ValidationError(
+                tempaudiofile_object.name + " is already recorded")
+        attrs['md5_generated'] = md5
+        return attrs
 
     class Meta:
         model = MediaResource
@@ -101,12 +101,34 @@ class MediaResourceSerializer(serializers.ModelSerializer):
         newaudio.save()
         newaudio.audiofile = validated_data.get(
             'audiofile', newaudio.audiofile)
+        newaudio.md5_generated = validated_data.get(
+            'md5_generated')
         newaudio.save()
+
         return newaudio
 
-    def validate_audiofile(self, value):
-        typeoffile = magic.from_file(value.temporary_file_path(), mime=True)
-        if 'audio/mpeg' not in typeoffile:
-            raise serializers.ValidationError(
-                value.name + " is not a valid MP3")
-        return value
+    # def validate_audiofile(self, value):
+    #     typeoffile = magic.from_file(value.temporary_file_path(), mime=True)
+    #     if 'audio/mpeg' not in typeoffile:
+    #         raise serializers.ValidationError(
+    #             value.name + " is not a valid MP3")
+    #     md5, sha1 = create_hash(value)
+    #     print(f"{md5}")
+    #     print(MediaResource.objects.filter(md5_generated=md5))
+    #     if MediaResource.objects.filter(md5_generated=md5).exists():
+    #         raise serializers.ValidationError(
+    #             value.name + " is already recorded")
+    #     return value
+
+
+def create_hash(file):
+    BUF_SIZE = 65536  # lets read stuff in 64kb chunks!
+
+    md5 = hashlib.md5()
+    sha1 = hashlib.sha1()
+
+    for chunk in file.chunks(chunk_size=BUF_SIZE):
+        md5.update(chunk)
+        sha1.update(chunk)
+
+    return md5.hexdigest(), sha1.hexdigest()

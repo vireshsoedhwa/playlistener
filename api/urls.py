@@ -7,8 +7,7 @@ from rest_framework.routers import DefaultRouter
 # from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
-    path('submitlink', views.Submitlink.as_view()),
-    path('getfile/<int:id>', views.Getfile.as_view()),
+    # path('getfile/<int:id>', views.Getfile.as_view()),
     # path('list', views.List.as_view()),
 ]
 
