@@ -11,11 +11,14 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 import os
-# from pathlib import Path
+from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
                     
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -59,7 +62,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'playlistener.urls'
+ROOT_URLCONF = 'playlistenerapi.urls'
 
 TEMPLATES = [
     {
@@ -77,8 +80,7 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'playlistener.wsgi.application'
-ASGI_APPLICATION = "playlistener.asgi.application"
+ASGI_APPLICATION = "playlistenerapi.asgi.application"
 
 CHANNEL_LAYERS = {
     # 'default': {

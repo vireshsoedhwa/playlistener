@@ -28,7 +28,7 @@ COPY manage.py supervisord.conf ./
 COPY docker-entrypoint.sh /usr/local/bin
 
 # COPY /nginx/nginx.conf /etc/nginx/nginx.conf
-COPY playlistener playlistener
+COPY playlistenerapi playlistenerapi
 # COPY frontend frontend
 COPY api api
 

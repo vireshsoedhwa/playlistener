@@ -2,6 +2,6 @@ version: '3.8'
 
 services:
   api:
-    image: playlistener-api
+    image: playlistenerapi
     build:
       context: .
