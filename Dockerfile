@@ -32,9 +32,6 @@ COPY playlistenerapi playlistenerapi
 # COPY frontend frontend
 COPY api api
 
-EXPOSE 9000
-EXPOSE 9001
-
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["supervisord", "-c", "supervisord.conf", "-n"]
 # CMD ["daphne", "-b", "0.0.0.0", "-p", "9001", "playlistener.asgi:application"]

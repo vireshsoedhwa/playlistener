@@ -9,11 +9,13 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
+    networks:
+      playlistener-network:    
 
-  api:
+  app:
     build:
       context: .
-    command: python manage.py runserver 0.0.0.0:9002
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
     environment:
@@ -27,6 +29,14 @@ services:
     depends_on:
       - db
     ports:
-      - "9000:9000"    
-      - "9001:9001"
-      - "9002:9002"
+      - "8000:8000"
+    networks:
+      playlistener-network:    
+        aliases:
+          - playlistenerapi
+
+networks:
+  playlistener-network:
+    external: true
+    driver: bridge
+    name: playlistener-network

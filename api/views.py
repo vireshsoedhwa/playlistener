@@ -44,7 +44,13 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
     def list(self, request):
         show = None
         if "show" in request.query_params:
-            show = int(request.query_params['show'])
+            try:
+                if int(request.query_params['show']) == 0:
+                    show = None
+                else:
+                    show = int(request.query_params['show'])
+            except:
+                show = None
         recent = MediaResource.objects.all().order_by('-created_at')[:show]
         serializer = self.get_serializer(recent, many=True)
         return Response(serializer.data)
@@ -71,11 +77,12 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
                 filename = mediaresource.audiofile.name
             else:
                 filename = mediaresource.title
+
             file_response = FileResponse(mediaresource.audiofile)
             file_response[
-                'Content-Disposition'] = 'attachment; filename="' + filename
+                'Content-Disposition'] = 'attachment; filename="' + filename + '.mp3"'
             return file_response
-        
+
         mediaresource_serializer = self.get_serializer(mediaresource)
         return Response(mediaresource_serializer.data)
 
@@ -85,7 +92,7 @@ class YoutubeMediaResourceViewSet(viewsets.ModelViewSet):
     serializer_class = YoutubeMediaResourceSerializer
 
     def create(self, request):
-        
+
         youtube_media_resource_serializer = self.get_serializer(
             data=request.data)
 
