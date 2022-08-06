@@ -8,6 +8,7 @@ from .youtube import YT
 from .helper import create_hash
 import time
 import os
+from pathlib import Path
 
 import logging
 logger = logging.getLogger(__name__)
@@ -28,6 +29,14 @@ def get_video(mediaresource):
         os.remove(settings.MEDIA_ROOT +
                   str(mediaresource.id) + '/archive')
         logger.info("deleting youtubedl archive file")
+
+    path = Path(mediaresource.audiofile.path)
+    if path.is_file():
+        if os.path.exists(settings.MEDIA_ROOT + str(mediaresource.id) + '/temp/' + path.name):
+            os.remove(settings.MEDIA_ROOT +
+                      str(mediaresource.id) + '/temp/' + path.name)
+            os.rmdir(settings.MEDIA_ROOT + str(mediaresource.id) + '/temp')
+            logger.info("deleting temp mp3 file")
 
 
 # def test_task():

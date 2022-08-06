@@ -1,6 +1,7 @@
 import youtube_dl
 from .models import MediaResource
 from django.core.files.base import ContentFile
+from pathlib import Path
 from django.core.files import File
 from django.conf import settings
 
@@ -12,6 +13,7 @@ logger = logging.getLogger(__name__)
 class YT:
     def __init__(self, mediaobject):
         self.mediaobject = mediaobject
+        self.filename_mp3 = ""
 
         self.ydl_opts = {
             'writethumbnail': True,
@@ -35,7 +37,7 @@ class YT:
             # 'writeinfojson':
             # '/code/dl/' + str(mediaobject.id),
             'restrictfilenames': True,
-            'outtmpl': settings.MEDIA_ROOT + str(mediaobject.id) + '/%(title)s.%(ext)s',
+            'outtmpl': settings.MEDIA_ROOT + str(mediaobject.id) + '/temp/%(title)s.%(ext)s',
         }
 
     def my_hook(self, d):
@@ -51,14 +53,13 @@ class YT:
             self.mediaobject.youtube_data.busy = False
             self.mediaobject.youtube_data.save()
         if d['status'] == 'finished':
-            get_just_filename = re.search(r"(.*\/)([^\/]*)\.[a-zA-Z0-9]*",
-                                          d['filename'])
-            self.mediaobject.audiofile.name = get_just_filename.group(
-                1) + get_just_filename.group(2) + ".mp3"
-            self.mediaobject.youtube_data.download_finished = True
-            self.mediaobject.youtube_data.busy = False
-            self.mediaobject.youtube_data.save()
-            self.mediaobject.save()
+            path = Path(d['filename'])
+            if path.is_file():
+                # print(path.name)
+                # print(path.stem)
+                self.filename_mp3 = '/temp/' + path.stem + '.mp3'
+
+
 
     def run(self):
         youtube_target_url = "https://youtube.com/watch?v=" + \
@@ -87,8 +88,26 @@ class YT:
 
             try:
                 ydl.download([youtube_target_url])
+                path = Path(settings.MEDIA_ROOT + str(self.mediaobject.id) + self.filename_mp3)
+                if path.is_file():
+                    # print(f'The file {self.filename_mp3} exists')
+                    with path.open(mode='rb') as f:
+                        self.mediaobject.audiofile = File(f, path.name)
+                        self.mediaobject.audiofile.name = path.name
+                        self.mediaobject.youtube_data.download_finished = True
+                        self.mediaobject.youtube_data.busy = False
+                        self.mediaobject.youtube_data.save()
+                        self.mediaobject.save()
+                else:
+                    # print(f'The file {self.filepath_mp3} does not exist')
+                    self.mediaobject.youtube_data.download_finished = False
+                    self.mediaobject.youtube_data.busy = False
+                    self.mediaobject.youtube_data.save()
+                    self.mediaobject.youtube_data.error = "Failed to download file"
+                    self.mediaobject.save()
             except Exception as e:
-                self.mediaobject.error = e
+                print("exception")
+                self.mediaobject.youtube_data.error = "exception"
                 self.mediaobject.save()
 
 class MyLogger(object):

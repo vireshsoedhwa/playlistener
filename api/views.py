@@ -97,7 +97,7 @@ class YoutubeMediaResourceViewSet(viewsets.ModelViewSet):
             data=request.data)
 
         if youtube_media_resource_serializer.is_valid(raise_exception=True):
-            youtube_media_resource_serializer.save()
+            new_id = youtube_media_resource_serializer.save()
             return Response(youtube_media_resource_serializer.data)
         return Response(youtube_media_resource_serializer.errors)
 

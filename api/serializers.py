@@ -44,9 +44,13 @@ class YoutubeMediaResourceSerializer(serializers.ModelSerializer):
                   'downloadprogress', 'eta', 'elapsed', 'speed']
 
     def create(self, validated_data):
+
+        if YoutubeMediaResource.objects.filter(youtube_id=validated_data['youtube_id']).exists():
+            existing_youtube_resource = YoutubeMediaResource.objects.get(youtube_id=validated_data['youtube_id'])
+            return existing_youtube_resource
+
         new_youtube_resource = YoutubeMediaResource.objects.create(
             **validated_data)
-        new_youtube_resource.save()
         return new_youtube_resource
 
     def validate_youtube_id(self, value):
@@ -57,9 +61,6 @@ class YoutubeMediaResourceSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 f"[{value}] is not a valid youtube URL")
 
-        if YoutubeMediaResource.objects.filter(youtube_id=x.group(2)).exists():
-            raise serializers.ValidationError(
-                f"[{value}] has already been recorded")
         return x.group(2)
 
 

@@ -11,7 +11,6 @@ import re
 
 
 def file_directory_path(instance, filename):
-
     return ('{0}/{1}').format(instance.id, filename)
 
 
@@ -77,3 +76,4 @@ def checkdownload(sender, instance, created, raw, using, update_fields, **kwargs
     else:
         pass
         # TODO retry download here on user request
+    
