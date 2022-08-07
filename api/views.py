@@ -19,8 +19,7 @@ from .youtube import YT
 from django_q.tasks import async_task, result, fetch
 # from django.core.exceptions import ObjectDoesNotExist
 
-# from rest_framework.decorators import api_view, throttle_classes
-# from rest_framework.throttling import UserRateThrottle
+from rest_framework.throttling import BaseThrottle
 from django.http import Http404, QueryDict
 
 
@@ -31,9 +30,16 @@ from rest_framework.decorators import action
 from rest_framework import renderers
 
 import logging
+import random
 
-from api import serializers
 logger = logging.getLogger(__name__)
+
+class CustomRateThrottle(BaseThrottle):
+    def allow_request(self, request, view):
+        return random.randint(1, 10) != 1
+    def wait(self):
+        # wait 5 seconds between each request
+        return 5
 
 
 class MediaResourceViewSet(viewsets.ModelViewSet):
@@ -87,9 +93,11 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
         return Response(mediaresource_serializer.data)
 
 
+
 class YoutubeMediaResourceViewSet(viewsets.ModelViewSet):
     queryset = YoutubeMediaResource.objects.all()
     serializer_class = YoutubeMediaResourceSerializer
+    throttle_classes = [CustomRateThrottle]
 
     def create(self, request):
 
@@ -100,83 +108,6 @@ class YoutubeMediaResourceViewSet(viewsets.ModelViewSet):
             new_id = youtube_media_resource_serializer.save()
             return Response(youtube_media_resource_serializer.data)
         return Response(youtube_media_resource_serializer.errors)
-
-
-# class Submitlink(APIView):
-#     def sanitize_url(self, url):
-#         try:
-#             regExp = ".*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*"
-#             x = re.search(regExp, url)
-#             video_id = x.group(2)
-#             return video_id
-#         except:
-#             raise Http404
-
-#     def get_object(self, youtube_id):
-#         try:
-#             youtube_media_resource = YoutubeMediaResource.objects.get(
-#                 youtube_id=youtube_id)
-#             return youtube_media_resource
-#         except YoutubeMediaResource.DoesNotExist:
-#             return None
-
-#     def put(self, request):
-#         url = request.query_params.get("youtube_id", None)
-#         if url:
-#             youtube_id = self.sanitize_url(url)
-#             existing_object = self.get_object(youtube_id)
-#             query_dict = request.query_params.copy()
-#             query_dict['youtube_id'] = youtube_id
-#             serializer = SubmitLinkSerializer(
-#                 existing_object, data=query_dict, partial=True)
-
-#             if serializer.is_valid():
-#                 serializer.save()
-#                 return Response(serializer.data)
-#             return Response(serializer.errors, status=400)
-#         return Response("no url provided", status=400)
-
-
-# class Getfile(APIView):
-#     serializer_class = GetfileSerializer
-
-#     @extend_schema(
-#         request=MediaResource
-#     )
-#     def get(self, request, id, format=None):
-
-#         serializer = GetfileSerializer(data={'id': id})
-
-#         if serializer.is_valid():
-#             try:
-#                 instance = MediaResource.objects.get(pk=id)
-#                 if instance.audiofile:
-#                     filename = 'download'
-#                     if instance.title is None:
-#                         filename = instance.audiofile.name
-#                     else:
-#                         filename = instance.title
-#                     file_response = FileResponse(instance.audiofile)
-#                     file_response[
-#                         'Content-Disposition'] = 'attachment; filename="' + filename
-#                     return file_response
-#                 else:
-#                     return JsonResponse({'id': id, 'download_finished': instance.youtube_data.download_finished, 'busy': instance.youtube_data.busy}, status=404)
-#             except MediaResource.DoesNotExist:
-#                 return Response(str(id)+' does not exist', status=404)
-#         return JsonResponse(serializer.errors, status=400)
-
-# # views.py
-# class FileUploadView(APIView):
-#     parser_classes = [MultiPartParser]
-
-#     def put(self, request, filename, format=None):
-#         file_obj = request.data['file']
-#         # ...
-#         # do some stuff with uploaded file
-#         # ...
-#         return Response(status=204)
-
 
 class RootPath(APIView):
     # permission_classes = [AllowAny]
