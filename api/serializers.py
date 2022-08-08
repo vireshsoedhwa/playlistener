@@ -97,7 +97,7 @@ class MediaResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MediaResource
-        fields = ['id', 'title', 'genre',
+        fields = ['id', 'title', 'genre', 'artists', 'tags', 
                   'audiofile', 'youtubedata', 'created_at']
 
     def create(self, validated_data):
