@@ -19,7 +19,7 @@ from .youtube import YT
 from django_q.tasks import async_task, result, fetch
 # from django.core.exceptions import ObjectDoesNotExist
 
-from rest_framework.throttling import BaseThrottle
+from rest_framework.throttling import BaseThrottle, AnonRateThrottle
 from django.http import Http404, QueryDict
 
 
@@ -34,12 +34,19 @@ import random
 
 logger = logging.getLogger(__name__)
 
-class CustomRateThrottle(BaseThrottle):
+# class CustomRateThrottle(BaseThrottle):
+#     def allow_request(self, request, view):
+#         return random.randint(1, 10) != 1
+#     def wait(self):
+#         # wait 5 seconds between each request
+#         return 5
+
+class PostAnonRateThrottle(AnonRateThrottle):
+    scope = 'post_anon'
     def allow_request(self, request, view):
-        return random.randint(1, 10) != 1
-    def wait(self):
-        # wait 5 seconds between each request
-        return 5
+        if request.method == "GET":
+            return True
+        return super().allow_request(request, view)
 
 
 class MediaResourceViewSet(viewsets.ModelViewSet):
@@ -95,7 +102,7 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
 class YoutubeMediaResourceViewSet(viewsets.ModelViewSet):
     queryset = YoutubeMediaResource.objects.all()
     serializer_class = YoutubeMediaResourceSerializer
-    throttle_classes = [CustomRateThrottle]
+    throttle_classes = [PostAnonRateThrottle]
 
     def create(self, request):
 

@@ -15,7 +15,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
-                    
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -30,7 +30,7 @@ DEBUG = os.getenv('DEBUG', False) == '1'
 PRODUCTION = os.getenv('PRODUCTION', False) == '1'
 
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS=['*']
+CSRF_TRUSTED_ORIGINS = ['*']
 
 CSRF_USE_SESSIONS = True
 CSRF_COOKIE_HTTPONLY = True
@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     'corsheaders',
     'rest_framework',
     'django_q',
@@ -166,7 +166,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = '/var/www/html/static/'
 
 MEDIA_ROOT = '/code/data/'
-# MEDIA_URL = 
+# MEDIA_URL =
 
 Q_CLUSTER = {
     'name': 'myproject',
@@ -188,9 +188,11 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ),
     'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle'
+        'rest_framework.throttling.ScopedRateThrottle',
     ],
+    'DEFAULT_THROTTLE_RATES': {
+        'post_anon': '1/second',
+    }
 }
 
 LOGGING = {
@@ -232,4 +234,3 @@ LOGGING = {
         }
     },
 }
-

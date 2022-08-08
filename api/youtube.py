@@ -4,6 +4,7 @@ from django.core.files.base import ContentFile
 from pathlib import Path
 from django.core.files import File
 from django.conf import settings
+from youtube_dl.utils import ExtractorError, YoutubeDLError
 
 import re
 import logging
@@ -58,54 +59,45 @@ class YT:
                 # print(path.stem)
                 self.filename_mp3 = '/temp/' + path.stem + '.mp3'
 
-
-
     def run(self):
         youtube_target_url = "https://youtube.com/watch?v=" + \
             str(self.mediaobject.youtubedata.youtube_id)
 
         with youtube_dl.YoutubeDL(self.ydl_opts) as ydl:
-            jsontry = ydl.extract_info(youtube_target_url,
-                                       download=False,
-                                       ie_key=None,
-                                       extra_info={},
-                                       process=True,
-                                       force_generic_extractor=False)
-
+            extracted_info = None
+            extracted_info = ydl.extract_info(youtube_target_url,
+                                              download=False,
+                                              ie_key=None,
+                                              extra_info={},
+                                              process=True,
+                                              force_generic_extractor=False)
             # check if genre is there
             try:
-                self.mediaobject.genre = jsontry["genre"]
+                self.mediaobject.genre = extracted_info["genre"]
                 logger.info("genre found")
             except:
                 logger.info("genre not available")
 
-            self.mediaobject.title = jsontry["title"]
-            self.mediaobject.description = jsontry["description"]
+            self.mediaobject.title = extracted_info["title"]
+            self.mediaobject.description = extracted_info["description"]
             self.mediaobject.save()
 
-            try:
-                print("before running process -------------------------")
-                ydl.download([youtube_target_url])
-                print("AFTER running process -------------------------")
-                path = Path(settings.MEDIA_ROOT + str(self.mediaobject.id) + self.filename_mp3)
-                if path.is_file():
-                    # print(f'The file {self.filename_mp3} exists')
-                    with path.open(mode='rb') as f:
-                        self.mediaobject.audiofile = File(f, path.name)
-                        self.mediaobject.audiofile.name = path.name
-                        self.mediaobject.youtubedata.status = 'DONE'
-                        self.mediaobject.youtubedata.save()
-                        self.mediaobject.save()
-                        return True
-                else:
-                    self.mediaobject.youtubedata.status = 'FAILED'
+            ydl.download([youtube_target_url])
+            path = Path(settings.MEDIA_ROOT +
+                        str(self.mediaobject.id) + self.filename_mp3)
+            if path.is_file():
+                # print(f'The file {self.filename_mp3} exists')
+                with path.open(mode='rb') as f:
+                    self.mediaobject.audiofile = File(f, path.name)
+                    self.mediaobject.audiofile.name = path.name
+                    self.mediaobject.youtubedata.status = 'DONE'
                     self.mediaobject.youtubedata.save()
-                    self.mediaobject.youtubedata.error = "Failed to download file"
                     self.mediaobject.save()
-            except Exception as e:
-                print("exception print")
-                print(e)
-                self.mediaobject.youtubedata.error = "exception"
+                    return True
+            else:
+                self.mediaobject.youtubedata.status = 'FAILED'
+                self.mediaobject.youtubedata.save()
+                self.mediaobject.youtubedata.error = "Failed to download file"
                 self.mediaobject.save()
 
 class MyLogger(object):
