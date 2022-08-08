@@ -40,13 +40,14 @@ class YoutubeMediaResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = YoutubeMediaResource
-        fields = ['youtube_id', 'download_finished', 'busy',
-                  'downloadprogress', 'eta', 'elapsed', 'speed']
+        fields = ['youtube_id', 'status', 'downloadprogress',
+                  'eta', 'elapsed', 'speed']
 
     def create(self, validated_data):
 
         if YoutubeMediaResource.objects.filter(youtube_id=validated_data['youtube_id']).exists():
-            existing_youtube_resource = YoutubeMediaResource.objects.get(youtube_id=validated_data['youtube_id'])
+            existing_youtube_resource = YoutubeMediaResource.objects.get(
+                youtube_id=validated_data['youtube_id'])
             return existing_youtube_resource
 
         new_youtube_resource = YoutubeMediaResource.objects.create(
@@ -65,7 +66,7 @@ class YoutubeMediaResourceSerializer(serializers.ModelSerializer):
 
 
 class MediaResourceSerializer(serializers.ModelSerializer):
-    youtube_data = YoutubeMediaResourceSerializer(many=False, read_only=True)
+    youtubedata = YoutubeMediaResourceSerializer(many=False, read_only=True)
 
     audiofile = serializers.FileField(
         max_length=None, allow_empty_file=False, use_url=False)
@@ -97,7 +98,7 @@ class MediaResourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = MediaResource
         fields = ['id', 'title', 'genre',
-                  'audiofile', 'youtube_data', 'created_at']
+                  'audiofile', 'youtubedata', 'created_at']
 
     def create(self, validated_data):
         newaudio = MediaResource.objects.create()

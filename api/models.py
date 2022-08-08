@@ -1,12 +1,19 @@
+from asyncio.log import logger
 from pickle import FALSE
 from django.db import models
 from django.core.files.storage import FileSystemStorage
+from django.utils.translation import gettext_lazy as _
 from django.db.models import Deferrable, UniqueConstraint
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.conf import settings
 
 from django_q.tasks import async_task, result, fetch
+import os
+import shutil
+import logging
+logger = logging.getLogger(__name__)
+
 
 
 def file_directory_path(instance, filename):
@@ -43,12 +50,12 @@ class MediaResource(models.Model):
                                  null=True,
                                  blank=True,
                                  max_length=500)
-    original_duration = models.DurationField(null=True)
+    original_duration = models.DurationField(null=True, blank=True)
     audiofile_432 = models.FileField(upload_to=file_directory_path,
                                      null=True,
                                      blank=True,
                                      max_length=500)
-    converted_432_duration = models.DurationField(null=True)
+    converted_432_duration = models.DurationField(null=True, blank=True)
     md5_generated = models.TextField(max_length=32, null=True, blank=True)
     genre = models.TextField(max_length=100, null=True, blank=True)
     artists = models.ManyToManyField(Artist, blank=True)
@@ -60,19 +67,24 @@ class MediaResource(models.Model):
 
 
 class YoutubeMediaResource(models.Model):
+    class Status(models.TextChoices):
+        NEW = 'NEW', _('New')
+        BUSY = 'BUSY', _('Busy')
+        FAILED = 'FAILED', _('Failed')
+        DONE = 'DONE', _('Done')
+
     youtube_id = models.TextField(primary_key=True, max_length=200)
     mediaresource = models.OneToOneField(
         MediaResource,
-        related_name='youtube_data',
+        related_name='youtubedata',
         on_delete=models.CASCADE,
         blank=True,
         null=True
     )
-    error = models.TextField(max_length=500)
-    download_finished = models.BooleanField(null=True,
-                                            blank=True,
-                                            default=False)
-    busy = models.BooleanField(null=True, blank=True, default=False)
+    error = models.TextField(max_length=500, null=True,
+                             blank=True,)
+    status = models.CharField(
+        max_length=7, choices=Status.choices, default=Status.NEW)
     downloadprogress = models.DecimalField(max_digits=3, decimal_places=0, blank=True,
                                            default=0)
     eta = models.DecimalField(max_digits=5, decimal_places=0, blank=True,
@@ -90,17 +102,19 @@ def checkdownload(sender, instance, created, raw, using, update_fields, **kwargs
         mediaresource.save()
         instance.mediaresource = mediaresource
         instance.save()
-        if instance.download_finished is False:
-            if instance.busy is False:
-                async_task('api.task.get_video', mediaresource, sync=False)
+        if instance.status == "NEW":
+            instance.status = "BUSY"
+            instance.save()
+            async_task('api.task.get_video', mediaresource, sync=False)
     else:
         pass
         # TODO retry download here on user request
 
 # signal for deleting
-
-
 @receiver(post_delete, sender=MediaResource, dispatch_uid="delete_yt_archive_record")
-def delete_record(sender, instance, **kwargs):
-
-    print(f"Deleted ID:{instance.id}")
+def delete_mediasource_record(sender, instance, **kwargs):
+    logger.info(f"Deleting record id#:{instance.id}")
+    try:
+        shutil.rmtree(settings.MEDIA_ROOT + str(instance.id))
+    except:
+        logger.error("Files could not be deleted")

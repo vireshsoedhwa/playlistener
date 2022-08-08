@@ -92,8 +92,6 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
         mediaresource_serializer = self.get_serializer(mediaresource)
         return Response(mediaresource_serializer.data)
 
-
-
 class YoutubeMediaResourceViewSet(viewsets.ModelViewSet):
     queryset = YoutubeMediaResource.objects.all()
     serializer_class = YoutubeMediaResourceSerializer
@@ -108,6 +106,16 @@ class YoutubeMediaResourceViewSet(viewsets.ModelViewSet):
             new_id = youtube_media_resource_serializer.save()
             return Response(youtube_media_resource_serializer.data)
         return Response(youtube_media_resource_serializer.errors)
+
+
+
+
+
+
+
+
+
+
 
 class RootPath(APIView):
     # permission_classes = [AllowAny]
