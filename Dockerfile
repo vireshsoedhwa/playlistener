@@ -14,9 +14,6 @@ RUN set -ex; \
             ffmpeg \
             gdal-bin \
             libmagic1 \
-            # curl \
-            # gcc \
-            # nginx \
         ; \
         python -m venv /opt/venv; \
         pip install --upgrade pip; \
@@ -26,14 +23,10 @@ RUN mkdir -p /run/daphne
 
 COPY manage.py supervisord.conf ./
 COPY docker-entrypoint.sh /usr/local/bin
-
-# COPY /nginx/nginx.conf /etc/nginx/nginx.conf
 COPY playlistenerapi playlistenerapi
-# COPY frontend frontend
 COPY api api
+
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["supervisord", "-c", "supervisord.conf", "-n"]
-# CMD ["daphne", "-b", "0.0.0.0", "-p", "9001", "playlistener.asgi:application"]
-# CMD ["nginx", "-g", "daemon off;"]
-
