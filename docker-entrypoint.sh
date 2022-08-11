@@ -10,9 +10,9 @@ echo "--------------------------------------------------------------------------
 python manage.py migrate
 echo "-------------------------------------------------------------------------------------------\n"
 
-# # Collect static files
-# >&2 echo "Collect static"
-# python manage.py collectstatic --noinput
+# Collect static files
+>&2 echo "Collect static"
+python manage.py collectstatic --noinput
 
 >&2 echo "Start Django Q task Scheduler"
 python manage.py qcluster &
