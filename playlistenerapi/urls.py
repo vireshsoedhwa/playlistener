@@ -19,15 +19,15 @@ from django.conf import settings
 from api import views
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),
     path('', include('api.urls')),
+    path('admin/', admin.site.urls),
 ]
 
-if settings.DEBUG:
-    urlpatterns += [
-        path('admin/', admin.site.urls)
-    ]
-else:
-    urlpatterns += [path('', views.RootPath.as_view(), name='root')]
+# if settings.DEBUG:
+#     urlpatterns += [
+#         path('admin/', admin.site.urls)
+#     ]
+# else:
+#     urlpatterns += [path('', views.RootPath.as_view(), name='root')]
 
 # handler404 = 'api.views.view_404'
