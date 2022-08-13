@@ -11,12 +11,12 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
-from .serializers import SubmitLinkSerializer, GetfileSerializer, MediaResourceSerializer, YoutubeMediaResourceSerializer
+from .serializers import MediaResourceSerializer
 
-from .models import MediaResource, YoutubeMediaResource
-from .youtube import YT
+from .models import MediaResource
+# from .youtube import YT
 
-from django_q.tasks import async_task, result, fetch
+# from django_q.tasks import async_task, result, fetch
 # from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework.throttling import BaseThrottle, AnonRateThrottle
@@ -99,30 +99,20 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
         mediaresource_serializer = self.get_serializer(mediaresource)
         return Response(mediaresource_serializer.data)
 
-class YoutubeMediaResourceViewSet(viewsets.ModelViewSet):
-    queryset = YoutubeMediaResource.objects.all()
-    serializer_class = YoutubeMediaResourceSerializer
-    throttle_classes = [PostAnonRateThrottle]
+# class YoutubeMediaResourceViewSet(viewsets.ModelViewSet):
+#     queryset = YoutubeMediaResource.objects.all()
+#     serializer_class = YoutubeMediaResourceSerializer
+#     throttle_classes = [PostAnonRateThrottle]
 
-    def create(self, request):
+#     def create(self, request):
 
-        youtube_media_resource_serializer = self.get_serializer(
-            data=request.data)
+#         youtube_media_resource_serializer = self.get_serializer(
+#             data=request.data)
 
-        if youtube_media_resource_serializer.is_valid(raise_exception=True):
-            new_id = youtube_media_resource_serializer.save()
-            return Response(youtube_media_resource_serializer.data)
-        return Response(youtube_media_resource_serializer.errors)
-
-
-
-
-
-
-
-
-
-
+#         if youtube_media_resource_serializer.is_valid(raise_exception=True):
+#             new_id = youtube_media_resource_serializer.save()
+#             return Response(youtube_media_resource_serializer.data)
+#         return Response(youtube_media_resource_serializer.errors)
 
 class RootPath(APIView):
     # permission_classes = [AllowAny]
