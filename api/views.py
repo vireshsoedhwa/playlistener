@@ -11,7 +11,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
-from .serializers import SubmitLinkSerializer, GetfileSerializer, MediaResourceSerializer, YoutubeMediaResourceSerializer
+from .serializers import MediaResourceSerializer, YoutubeMediaResourceSerializer
 
 from .models import MediaResource, YoutubeMediaResource
 from .youtube import YT

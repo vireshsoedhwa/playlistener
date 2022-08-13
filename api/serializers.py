@@ -9,29 +9,23 @@ import magic
 from .helper import create_hash
 from django.core.files import File
 
+import os
+
 import logging
 logger = logging.getLogger(__name__)
 
 
 class SubmitLinkSerializer(serializers.Serializer):
-
     youtube_id = serializers.CharField(
         #    validators=[validate_url],
         max_length=200,
         min_length=None,
         allow_blank=False)
-
     def create(self, validated_data):
         return YoutubeMediaResource.objects.create(**validated_data)
-
     def update(self, instance, validated_data):
         instance.save()
         return instance
-
-
-class GetfileSerializer(serializers.Serializer):
-    id = serializers.IntegerField(max_value=None, min_value=None)
-
 
 class YoutubeMediaResourceSerializer(serializers.ModelSerializer):
 
@@ -40,7 +34,7 @@ class YoutubeMediaResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = YoutubeMediaResource
-        fields = ['youtube_id', 'status', 'downloadprogress',
+        fields = ['youtube_id', 'mediaresource', 'status', 'downloadprogress',
                   'eta', 'elapsed', 'speed']
 
     def create(self, validated_data):
@@ -67,17 +61,8 @@ class YoutubeMediaResourceSerializer(serializers.ModelSerializer):
 
 class MediaResourceSerializer(serializers.ModelSerializer):
     youtubedata = YoutubeMediaResourceSerializer(many=False, read_only=True)
-
     audiofile = serializers.FileField(
         max_length=None, allow_empty_file=False, use_url=False)
-    # title = serializers.CharField(
-    #     max_length=500,
-    #     min_length=None,
-    #     allow_blank=True)
-
-    # description = models.TextField(max_length=5000, null=True, blank=True)
-    # genre = models.TextField(max_length=100, null=True, blank=True)
-    # artist = models.TextField(max_length=100, null=True, blank=True)
 
     def validate(self, attrs):
         tempaudiofile_object = attrs.get(
@@ -99,7 +84,7 @@ class MediaResourceSerializer(serializers.ModelSerializer):
         model = MediaResource
         fields = ['id', 'title', 'genre', 'artists', 'tags', 
                   'audiofile', 'youtubedata', 'created_at']
-
+   
     def create(self, validated_data):
         newaudio = MediaResource.objects.create()
         newaudio.save()

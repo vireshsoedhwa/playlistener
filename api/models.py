@@ -8,6 +8,8 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.conf import settings
 
+import os
+
 from django_q.tasks import async_task, result, fetch
 import shutil
 import logging
@@ -62,7 +64,7 @@ class MediaResource(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return str(self.id) + " : " + str(self.title)
+        return str(self.id) + " : " + str(self.title) + " - " + str(os.path.basename(self.audiofile.name))  
 
 
 class YoutubeMediaResource(models.Model):
