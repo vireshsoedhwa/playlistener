@@ -5,7 +5,7 @@ from django.core.files.base import ContentFile
 from django.core.files import File
 from django.conf import settings
 from .youtube import YT
-from .helper import create_hash
+from .utils.hashlib import create_hash
 import time
 import os
 from pathlib import Path

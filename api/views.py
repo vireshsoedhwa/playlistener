@@ -68,17 +68,17 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(recent, many=True)
         return Response(serializer.data)
 
-    def create(self, request):
-        validlist = []
-        for audiofile in request.data.getlist('audiofile'):
-            mediaresource_serializer = self.get_serializer(
-                data={'audiofile': audiofile})
-            if mediaresource_serializer.is_valid():
-                mediaresource_serializer.save()
-                validlist.append(str(audiofile))
-            else:
-                validlist.append(mediaresource_serializer.errors)
-        return Response(validlist)
+    # def create(self, request):
+    #     validlist = []
+    #     for audiofile in request.data.getlist('audiofile'):
+    #         mediaresource_serializer = self.get_serializer(
+    #             data={'audiofile': audiofile})
+    #         if mediaresource_serializer.is_valid():
+    #             mediaresource_serializer.save()
+    #             validlist.append(str(audiofile))
+    #         else:
+    #             validlist.append(mediaresource_serializer.errors)
+    #     return Response(validlist)
 
     @action(detail=True)
     def download(self, request, *args, **kwargs):

@@ -81,38 +81,8 @@ TEMPLATES = [
 
 ASGI_APPLICATION = "playlistenerapi.asgi.application"
 
-CHANNEL_LAYERS = {
-    # 'default': {
-    #     'BACKEND': 'channels_redis.core.RedisChannelLayer',
-    #     'CONFIG': {
-    #         "hosts": [('redis', 6379)],
-    #     },
-    # },
-}
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': '/tmp/database',
-#         'TEST': {
-#             'NAME': '/tmp/db_test.sqlite3'
-#         }
-#     }
-# }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'postgres',
-#         'USER': 'postgres',
-#         'PASSWORD': 'postgres',
-#         'HOST': 'db',
-#         'PORT': 5432,
-#     }
-# }
 
 DATABASES = {
     'default': {
@@ -166,6 +136,7 @@ STATIC_ROOT = '/var/www/html/static/'
 
 MEDIA_ROOT = '/code/data/'
 # MEDIA_URL =
+FILE_UPLOAD_MAX_MEMORY_SIZE = 20971520 # 20MB
 
 Q_CLUSTER = {
     'name': 'myproject',
