@@ -21,22 +21,22 @@ class Tag(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, unique=True, blank=False)
 
-    class Meta:
-        ordering = ['name']
+    # class Meta:
+    #     ordering = ['name']
 
     def __str__(self):
-        return str(self.name)
+        return str(self.id) + " : " + str(self.name)
 
 
 class Artist(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100, unique=True, blank=False)
+    name = models.CharField(max_length=100, unique=True, blank=True)
 
-    class Meta:
-        ordering = ['name']
+    # class Meta:
+    #     ordering = ['name']
 
     def __str__(self):
-        return str(self.name)
+        return str(self.id) + " : " + str(self.name)
 
 
 class MediaResource(models.Model):
@@ -55,7 +55,8 @@ class MediaResource(models.Model):
     converted_432_duration = models.DurationField(null=True, blank=True)
     md5_generated = models.TextField(max_length=32, null=True, blank=True)
     genre = models.TextField(max_length=100, null=True, blank=True)
-    artists = models.ManyToManyField(Artist, blank=True)
+    artists = models.ManyToManyField(
+        Artist, related_name='artists', blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -63,6 +64,8 @@ class MediaResource(models.Model):
         return str(self.id) + " : " + str(self.title)
 
 # signal for deleting
+
+
 @receiver(post_delete, sender=MediaResource, dispatch_uid="delete_yt_archive_record")
 def delete_mediasource_record(sender, instance, **kwargs):
     logger.info(f"Deleting record id#:{instance.id}")

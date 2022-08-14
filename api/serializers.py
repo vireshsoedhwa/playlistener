@@ -1,7 +1,7 @@
 from logging.config import valid_ident
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from .models import MediaResource
+from .models import MediaResource, Artist, Tag
 from django.db import IntegrityError
 import re
 import magic
@@ -14,9 +14,19 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+class ArtistListingField(serializers.RelatedField):
+    def to_representation(self, value):
+        return f'{value.name}'
+
+    def to_internal_value(self, data):
+        return data
+
 class MediaResourceSerializer(serializers.ModelSerializer):
+    # artists = ArtistSerializer(many=True)
     audiofile = serializers.FileField(
         max_length=None, allow_empty_file=False, use_url=False)
+    # artists = serializers.PrimaryKeyRelatedField(many=True, queryset=Artist.objects.all())
+    artists = ArtistListingField(many=True, queryset=Artist.objects.all())
 
     def validate(self, attrs):
         tempaudiofile = attrs.get(
@@ -25,7 +35,8 @@ class MediaResourceSerializer(serializers.ModelSerializer):
         file_hash = None
         try:
             if(type(tempaudiofile) is InMemoryUploadedFile):
-                file_type = magic.from_buffer(tempaudiofile.read(2048), mime=True)
+                file_type = magic.from_buffer(
+                    tempaudiofile.read(2048), mime=True)
                 file_hash = create_hash_from_memory(tempaudiofile)
             elif(type(tempaudiofile) is TemporaryUploadedFile):
                 file_type = magic.from_file(
@@ -34,7 +45,8 @@ class MediaResourceSerializer(serializers.ModelSerializer):
                     tempaudiofile.temporary_file_path())
         except Exception as e:
             logger.error(e)
-            raise serializers.ValidationError(tempaudiofile.name + " Could not be Validated")
+            raise serializers.ValidationError(
+                tempaudiofile.name + " Could not be Validated")
 
         if 'audio/mpeg' not in file_type:
             raise serializers.ValidationError(
@@ -52,12 +64,21 @@ class MediaResourceSerializer(serializers.ModelSerializer):
                   'audiofile', 'created_at']
 
     def create(self, validated_data):
-        newaudio = MediaResource.objects.create()
-        newaudio.save()
-        newaudio.audiofile = validated_data.get(
-            'audiofile', newaudio.audiofile)
-        newaudio.md5_generated = validated_data.get(
+        newrecord = MediaResource.objects.create()
+        newrecord.save()
+        newrecord.audiofile = validated_data.get(
+            'audiofile', newrecord.audiofile)
+        newrecord.md5_generated = validated_data.get(
             'md5_generated')
-        newaudio.save()
 
-        return newaudio
+        artist_data = validated_data.get('artists')
+
+        for artist in artist_data:
+            print(artist)
+            newrecord.artists.add(artist)
+        # artists = Artist.objects.filter()
+        # print(validated_data)
+        # print(validated_data.get('artists'))
+        # newrecord.save()
+        # newrecord.artists.set(validated_data.get('artists'))
+        return newrecord
