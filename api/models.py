@@ -9,6 +9,7 @@ from django.conf import settings
 
 # from django_q.tasks import async_task, result, fetch
 import shutil
+import os.path
 import logging
 logger = logging.getLogger(__name__)
 
@@ -56,12 +57,12 @@ class MediaResource(models.Model):
     md5_generated = models.TextField(max_length=32, null=True, blank=True)
     genre = models.TextField(max_length=100, null=True, blank=True)
     artists = models.ManyToManyField(
-        Artist, related_name='artists', blank=True, null=True)
-    tags = models.ManyToManyField(Tag, blank=True)
+        Artist, related_name='artists', blank=True)
+    tags = models.ManyToManyField(Tag, related_name='artists', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return str(self.id) + " : " + str(self.title)
+        return str(self.id) + " : " + str(os.path.basename(self.audiofile.name)) + " : " + str(self.title)
 
 # signal for deleting
 

@@ -41,8 +41,10 @@ logger = logging.getLogger(__name__)
 #         # wait 5 seconds between each request
 #         return 5
 
+
 class PostAnonRateThrottle(AnonRateThrottle):
     scope = 'post_anon'
+
     def allow_request(self, request, view):
         if request.method == "GET":
             return True
@@ -68,6 +70,19 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(recent, many=True)
         return Response(serializer.data)
 
+    def partial_update(self, request, pk=None):
+
+        record_to_update = MediaResource.objects.get(pk=pk)
+
+        mediaresource_serializer = self.get_serializer(
+            record_to_update, request.data, partial=True)
+
+        if mediaresource_serializer.is_valid():
+            result = mediaresource_serializer.save()
+            result.save()
+            return Response(mediaresource_serializer.data)
+
+        return Response(mediaresource_serializer.error)
     # def create(self, request):
     #     validlist = []
     #     for audiofile in request.data.getlist('audiofile'):
@@ -113,6 +128,7 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
 #             new_id = youtube_media_resource_serializer.save()
 #             return Response(youtube_media_resource_serializer.data)
 #         return Response(youtube_media_resource_serializer.errors)
+
 
 class RootPath(APIView):
     # permission_classes = [AllowAny]
