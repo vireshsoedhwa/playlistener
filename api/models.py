@@ -20,7 +20,7 @@ def file_directory_path(instance, filename):
 
 class Tag(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100, unique=True, blank=False)
+    name = models.CharField(max_length=100, unique=True, blank=False, null=False)
 
     # class Meta:
     #     ordering = ['name']
@@ -31,7 +31,7 @@ class Tag(models.Model):
 
 class Artist(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100, unique=True, blank=True)
+    name = models.CharField(max_length=100, unique=True, blank=False, null=False)
 
     # class Meta:
     #     ordering = ['name']

@@ -101,16 +101,24 @@ class MediaResourceSerializer(serializers.ModelSerializer):
         try:
             artist_data = validated_data.get('artists')
             for artist in artist_data:
-                instance.artists.add(artist)
+                # first lookup if the artist exists if not then create it
+                artistObject, created = Artist.objects.get_or_create(name=artist.lower())
+                if created:
+                    logger.info(f"New artist added: {artistObject}")
+                instance.artists.add(artistObject)
         except:
-            logger.info("artists not updated")
+            logger.info("Artists not updated")
     
         try:
             tag_data = validated_data.get('tags')
             for tag in tag_data:
-                instance.tags.add(tag)
+                # first lookup if the tag exists if not then create it
+                tagObject, created = Tag.objects.get_or_create(name=tag.lower())
+                if created:
+                    logger.info(f"New tag added: {tagObject}")
+                instance.tags.add(tagObject)
         except:
-            logger.info("tags not updated")    
+            logger.info("Tags not updated")    
         
         instance.title = validated_data.get('title', instance.title)
         instance.description = validated_data.get(
