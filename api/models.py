@@ -20,7 +20,8 @@ def file_directory_path(instance, filename):
 
 class Tag(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100, unique=True, blank=False, null=False)
+    name = models.CharField(max_length=100, unique=True,
+                            blank=False, null=False)
 
     # class Meta:
     #     ordering = ['name']
@@ -31,7 +32,8 @@ class Tag(models.Model):
 
 class Artist(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100, unique=True, blank=False, null=False)
+    name = models.CharField(max_length=100, unique=True,
+                            blank=False, null=False)
 
     # class Meta:
     #     ordering = ['name']
@@ -67,10 +69,11 @@ class MediaResource(models.Model):
 # signal for deleting
 
 
-@receiver(post_delete, sender=MediaResource, dispatch_uid="delete_yt_archive_record")
+@receiver(post_delete, sender=MediaResource, dispatch_uid="delete_record")
 def delete_mediasource_record(sender, instance, **kwargs):
-    logger.info(f"Deleting record id#:{instance.id}")
+    logger.info(f"Deleting record id#: {instance.id}")
     try:
         shutil.rmtree(settings.MEDIA_ROOT + str(instance.id))
+        logger.info(f"Files deleted id#: {instance.id} ")
     except:
         logger.error("Files could not be deleted")
