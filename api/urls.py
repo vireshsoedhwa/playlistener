@@ -9,9 +9,6 @@ router = DefaultRouter()
 router.register(r'mediaresources', MediaResourceViewSet,
                 basename="mediaresources")
 
-# router.register(r'youtube', YoutubeMediaResourceViewSet,
-#                 basename="youtubemediaresources")
-
 urlpatterns = [
     path('', include(router.urls)),
 ]
