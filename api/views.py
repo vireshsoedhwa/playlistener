@@ -11,12 +11,12 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
-from .serializers import MediaResourceSerializer, YoutubeMediaResourceSerializer
+from .serializers import MediaResourceSerializer
 
-from .models import MediaResource, YoutubeMediaResource
-from .youtube import YT
+from .models import MediaResource
+# from .youtube import YT
 
-from django_q.tasks import async_task, result, fetch
+# from django_q.tasks import async_task, result, fetch
 # from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework.throttling import BaseThrottle, AnonRateThrottle
@@ -34,15 +34,9 @@ import random
 
 logger = logging.getLogger(__name__)
 
-# class CustomRateThrottle(BaseThrottle):
-#     def allow_request(self, request, view):
-#         return random.randint(1, 10) != 1
-#     def wait(self):
-#         # wait 5 seconds between each request
-#         return 5
-
 class PostAnonRateThrottle(AnonRateThrottle):
     scope = 'post_anon'
+
     def allow_request(self, request, view):
         if request.method == "GET":
             return True
@@ -53,6 +47,7 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
     queryset = MediaResource.objects.all()
     serializer_class = MediaResourceSerializer
     parser_classes = (MultiPartParser, FormParser, JSONParser)
+    throttle_classes = [PostAnonRateThrottle]
 
     def list(self, request):
         show = None
@@ -68,17 +63,30 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(recent, many=True)
         return Response(serializer.data)
 
-    def create(self, request):
-        validlist = []
-        for audiofile in request.data.getlist('audiofile'):
-            mediaresource_serializer = self.get_serializer(
-                data={'audiofile': audiofile})
-            if mediaresource_serializer.is_valid():
-                mediaresource_serializer.save()
-                validlist.append(str(audiofile))
-            else:
-                validlist.append(mediaresource_serializer.errors)
-        return Response(validlist)
+    def partial_update(self, request, pk=None):
+
+        record_to_update = MediaResource.objects.get(pk=pk)
+
+        mediaresource_serializer = self.get_serializer(
+            record_to_update, request.data, partial=True)
+
+        if mediaresource_serializer.is_valid(raise_exception=True):
+            result = mediaresource_serializer.save()
+            result.save()
+            return Response(mediaresource_serializer.data)
+
+        return Response(mediaresource_serializer.errors)
+    # def create(self, request):
+    #     validlist = []
+    #     for audiofile in request.data.getlist('audiofile'):
+    #         mediaresource_serializer = self.get_serializer(
+    #             data={'audiofile': audiofile})
+    #         if mediaresource_serializer.is_valid():
+    #             mediaresource_serializer.save()
+    #             validlist.append(str(audiofile))
+    #         else:
+    #             validlist.append(mediaresource_serializer.errors)
+    #     return Response(validlist)
 
     @action(detail=True)
     def download(self, request, *args, **kwargs):
@@ -98,31 +106,6 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
 
         mediaresource_serializer = self.get_serializer(mediaresource)
         return Response(mediaresource_serializer.data)
-
-class YoutubeMediaResourceViewSet(viewsets.ModelViewSet):
-    queryset = YoutubeMediaResource.objects.all()
-    serializer_class = YoutubeMediaResourceSerializer
-    throttle_classes = [PostAnonRateThrottle]
-
-    def create(self, request):
-
-        youtube_media_resource_serializer = self.get_serializer(
-            data=request.data)
-
-        if youtube_media_resource_serializer.is_valid(raise_exception=True):
-            new_id = youtube_media_resource_serializer.save()
-            return Response(youtube_media_resource_serializer.data)
-        return Response(youtube_media_resource_serializer.errors)
-
-
-
-
-
-
-
-
-
-
 
 class RootPath(APIView):
     # permission_classes = [AllowAny]

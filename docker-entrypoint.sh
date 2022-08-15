@@ -2,12 +2,14 @@
 
 set -e
 
+touch .env
+> .env
 echo DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY >> .env
 
 if [[ -z "${GO_PIPELINE_LABEL}" ]]; then
-  echo GO_PIPELINE_LABEL=dev >> .env
-else
   echo GO_PIPELINE_LABEL=$GO_PIPELINE_LABEL >> .env
+else
+  echo GO_PIPELINE_LABEL=dev >> .env
 fi
 
 >&2 echo "Make Database migrations"

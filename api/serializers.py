@@ -1,12 +1,13 @@
 from logging.config import valid_ident
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from django.core.validators import URLValidator
-from .models import MediaResource, YoutubeMediaResource
+from .models import MediaResource, Artist, Tag
 from django.db import IntegrityError
 import re
 import magic
-from .helper import create_hash
+from .utils.hashlib import create_hash_from_file
+from .utils.hashlib import create_hash_from_memory
+from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
 from django.core.files import File
 
 import os
@@ -14,84 +15,114 @@ import os
 import logging
 logger = logging.getLogger(__name__)
 
+class TagListingField(serializers.RelatedField):
+    def to_representation(self, value):
+        return f'{value.name}'
 
-class SubmitLinkSerializer(serializers.Serializer):
-    youtube_id = serializers.CharField(
-        #    validators=[validate_url],
-        max_length=200,
-        min_length=None,
-        allow_blank=False)
-    def create(self, validated_data):
-        return YoutubeMediaResource.objects.create(**validated_data)
-    def update(self, instance, validated_data):
-        instance.save()
-        return instance
+    def to_internal_value(self, data):
+        return data
 
-class YoutubeMediaResourceSerializer(serializers.ModelSerializer):
 
-    youtube_id = serializers.CharField(
-        max_length=None, min_length=None, allow_blank=False, trim_whitespace=True)
 
-    class Meta:
-        model = YoutubeMediaResource
-        fields = ['youtube_id', 'mediaresource', 'status', 'downloadprogress',
-                  'eta', 'elapsed', 'speed']
+class ArtistListingField(serializers.RelatedField):
+    def to_representation(self, value):
+        return f'{value.name}'
 
-    def create(self, validated_data):
-
-        if YoutubeMediaResource.objects.filter(youtube_id=validated_data['youtube_id']).exists():
-            existing_youtube_resource = YoutubeMediaResource.objects.get(
-                youtube_id=validated_data['youtube_id'])
-            return existing_youtube_resource
-
-        new_youtube_resource = YoutubeMediaResource.objects.create(
-            **validated_data)
-        return new_youtube_resource
-
-    def validate_youtube_id(self, value):
-        regExp = ".*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*"
-        x = re.search(regExp, value)
-        # http://img.youtube.com/vi/[video-id]/[thumbnail-number].jpg
-        if x == None:
-            raise serializers.ValidationError(
-                f"[{value}] is not a valid youtube URL")
-
-        return x.group(2)
+    def to_internal_value(self, data):
+        return data
 
 
 class MediaResourceSerializer(serializers.ModelSerializer):
-    youtubedata = YoutubeMediaResourceSerializer(many=False, read_only=True)
     audiofile = serializers.FileField(
         max_length=None, allow_empty_file=False, use_url=False)
-
+    artists = ArtistListingField(many=True, queryset=Artist.objects.all())
+    tags = TagListingField(many=True, queryset=Tag.objects.all())
+    title = serializers.CharField(
+        max_length=500, min_length=None, allow_blank=True, required=False, trim_whitespace=True)
+    description = serializers.CharField(
+        max_length=5000, min_length=None, allow_blank=True, required=False, trim_whitespace=True)
+    genre = serializers.CharField(
+        max_length=100, min_length=None, allow_blank=True, required=False, trim_whitespace=True)
     def validate(self, attrs):
-        tempaudiofile_object = attrs.get(
+        tempaudiofile = attrs.get(
             'audiofile')
-        typeoffile = magic.from_file(
-            tempaudiofile_object.temporary_file_path(), mime=True)
-        if 'audio/mpeg' not in typeoffile:
-            raise serializers.ValidationError(
-                tempaudiofile_object.name + " is not a valid MP3")
+        if tempaudiofile is None:
+            return attrs
+        else:
+            file_type = None
+            file_hash = None
+            try:
+                if(type(tempaudiofile) is InMemoryUploadedFile):
+                    file_type = magic.from_buffer(
+                        tempaudiofile.read(2048), mime=True)
+                    file_hash = create_hash_from_memory(tempaudiofile)
+                elif(type(tempaudiofile) is TemporaryUploadedFile):
+                    file_type = magic.from_file(
+                        tempaudiofile.temporary_file_path(), mime=True)
+                    file_hash = create_hash_from_file(
+                        tempaudiofile.temporary_file_path())
+            except Exception as e:
+                logger.error(e)
+                raise serializers.ValidationError(
+                    tempaudiofile.name + " Could not be Validated")
 
-        md5 = create_hash(tempaudiofile_object.temporary_file_path())
-        if MediaResource.objects.filter(md5_generated=md5).exists():
-            raise serializers.ValidationError(
-                tempaudiofile_object.name + " is already recorded")
-        attrs['md5_generated'] = md5
-        return attrs
+            if 'audio/mpeg' not in file_type:
+                raise serializers.ValidationError(
+                    tempaudiofile.name + " is not a valid MP3 file")
+
+            if MediaResource.objects.filter(md5_generated=file_hash).exists():
+                raise serializers.ValidationError(
+                    tempaudiofile.name + " is already recorded")
+            attrs['md5_generated'] = file_hash
+            return attrs
 
     class Meta:
         model = MediaResource
-        fields = ['id', 'title', 'genre', 'artists', 'tags', 
-                  'audiofile', 'youtubedata', 'created_at']
-   
-    def create(self, validated_data):
-        newaudio = MediaResource.objects.create()
-        newaudio.save()
-        newaudio.audiofile = validated_data.get(
-            'audiofile', newaudio.audiofile)
-        newaudio.md5_generated = validated_data.get(
-            'md5_generated')
-        newaudio.save()
+        fields = ['id', 'title', 'description', 'genre', 'artists', 'tags',
+                  'audiofile', 'created_at']
 
-        return newaudio
+    def create(self, validated_data):
+        newrecord = MediaResource.objects.create()
+        newrecord.save()
+        newrecord.audiofile = validated_data.get(
+            'audiofile', newrecord.audiofile)
+        newrecord.md5_generated = validated_data.get(
+            'md5_generated')
+        artist_data = validated_data.get('artists')
+        tag_data = validated_data.get('tags')
+        for tag in tag_data:
+            newrecord.tags.add(tag)
+        for artist in artist_data:
+            newrecord.artists.add(artist)
+        newrecord.save()
+        return newrecord
+
+    def update(self, instance, validated_data):
+
+        try:
+            artist_data = validated_data.get('artists')
+            for artist in artist_data:
+                # first lookup if the artist exists if not then create it
+                artistObject, created = Artist.objects.get_or_create(name=artist.lower())
+                if created:
+                    logger.info(f"New artist added: {artistObject}")
+                instance.artists.add(artistObject)
+        except:
+            logger.info("Artists not updated")
+    
+        try:
+            tag_data = validated_data.get('tags')
+            for tag in tag_data:
+                # first lookup if the tag exists if not then create it
+                tagObject, created = Tag.objects.get_or_create(name=tag.lower())
+                if created:
+                    logger.info(f"New tag added: {tagObject}")
+                instance.tags.add(tagObject)
+        except:
+            logger.info("Tags not updated")    
+        
+        instance.title = validated_data.get('title', instance.title)
+        instance.description = validated_data.get(
+            'description', instance.description)
+        instance.genre = validated_data.get('genre', instance.genre)
+        return instance
