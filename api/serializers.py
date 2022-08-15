@@ -10,9 +10,10 @@ from .utils.hashlib import create_hash_from_memory
 from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
 from django.core.files import File
 
+import os
+
 import logging
 logger = logging.getLogger(__name__)
-
 
 class TagListingField(serializers.RelatedField):
     def to_representation(self, value):
@@ -20,6 +21,7 @@ class TagListingField(serializers.RelatedField):
 
     def to_internal_value(self, data):
         return data
+
 
 
 class ArtistListingField(serializers.RelatedField):
@@ -41,7 +43,6 @@ class MediaResourceSerializer(serializers.ModelSerializer):
         max_length=5000, min_length=None, allow_blank=True, required=False, trim_whitespace=True)
     genre = serializers.CharField(
         max_length=100, min_length=None, allow_blank=True, required=False, trim_whitespace=True)
-
     def validate(self, attrs):
         tempaudiofile = attrs.get(
             'audiofile')
