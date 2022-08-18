@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  db:
+  datadb:
     image: postgres:alpine
     restart: always
     environment:
-      - POSTGRES_HOST=db
+      - POSTGRES_HOST=datadb
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
@@ -20,7 +20,7 @@ services:
       - .:/code
     environment:
       - DEBUG=1
-      - POSTGRES_HOST=db
+      - POSTGRES_HOST=datadb
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
@@ -29,7 +29,7 @@ services:
       - ADMIN_PASSWORD=admin
       - DJANGO_SECRET_KEY='m925%@rztqnd=%6l9neo!h2w=ro_iaw-uryy!jlsdvrmnl-qie'
     depends_on:
-      - db
+      - datadb
     ports:
       - "8000:8000"
     networks:
