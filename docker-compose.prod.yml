@@ -2,15 +2,8 @@ version: '3.8'
 
 services:
   apidb:
-    image: postgres:alpine
     restart: always
-    volumes:
-      - dataapi:/var/lib/postgresql/data
-    env_file:
-      - .env
-    networks:
-      playlistener-network:
-
+  
   app:
     restart: always
     volumes:
@@ -21,8 +14,6 @@ services:
       - PRODUCTION=1
     depends_on:
       - apidb
-    env_file:
-      - .env
     networks:
       playlistener-network:
         aliases:
@@ -42,14 +33,3 @@ services:
       - 8000:8000
     depends_on:
       - app
-
-volumes:
-  dataapi:
-    external: true
-  webassets: 
-
-networks:
-  playlistener-network:
-    external: true
-    driver: bridge
-    name: playlistener-network
