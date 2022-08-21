@@ -8,11 +8,14 @@
     docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 ## The following ENV Variables need to be set for prod:
-- POSTGRES_USER=
-- POSTGRES_PASSWORD=
-- ADMIN_USERNAME=
-- ADMIN_PASSWORD=
-- DJANGO_SECRET_KEY=
+- DJANGO_SECRET_KEY
+- POSTGRES_HOST
+- POSTGRES_PASSWORD
+- POSTGRES_DB
+- POSTGRES_USER
+- POSTGRES_PORT
+- ADMIN_USERNAME
+- ADMIN_PASSWORD
 
 Useful commands:
     

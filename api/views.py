@@ -34,6 +34,7 @@ import random
 
 logger = logging.getLogger(__name__)
 
+
 class PostAnonRateThrottle(AnonRateThrottle):
     scope = 'post_anon'
 
@@ -65,17 +66,18 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
 
     def partial_update(self, request, pk=None):
 
-        record_to_update = MediaResource.objects.get(pk=pk)
-
+        try:
+            record_to_update = MediaResource.objects.get(pk=pk)
+        except MediaResource.DoesNotExist:
+            return Response("record not found", status=400)
         mediaresource_serializer = self.get_serializer(
             record_to_update, request.data, partial=True)
 
         if mediaresource_serializer.is_valid(raise_exception=True):
             result = mediaresource_serializer.save()
             result.save()
-            return Response(mediaresource_serializer.data)
-
-        return Response(mediaresource_serializer.errors)
+            return Response(mediaresource_serializer.data, status=200)
+        return Response(mediaresource_serializer.errors, status=500)
     # def create(self, request):
     #     validlist = []
     #     for audiofile in request.data.getlist('audiofile'):
@@ -106,6 +108,7 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
 
         mediaresource_serializer = self.get_serializer(mediaresource)
         return Response(mediaresource_serializer.data)
+
 
 class RootPath(APIView):
     # permission_classes = [AllowAny]
