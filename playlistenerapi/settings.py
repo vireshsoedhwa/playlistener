@@ -21,11 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 GO_PIPELINE_LABEL = os.getenv('GO_PIPELINE_LABEL', "dev")
 SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+ADMIN_USERNAME = os.environ["ADMIN_USERNAME"]
+ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
 DEBUG = os.getenv('DEBUG', False) == '1'
 PRODUCTION = os.getenv('PRODUCTION', False) == '1'
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['*']
@@ -47,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_q',
     'channels',
+    
     'api'
 ]
 

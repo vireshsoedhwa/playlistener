@@ -110,21 +110,21 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
         return Response(mediaresource_serializer.data)
 
 
-class RootPath(APIView):
-    # permission_classes = [AllowAny]
-    def get(self, request, format=None):
-        return JsonResponse({"test": "value"},
-                            json_dumps_params={'indent': 2},
-                            status=200)
+# class RootPath(APIView):
+#     # permission_classes = [AllowAny]
+#     def get(self, request, format=None):
+#         return JsonResponse({"test": "value"},
+#                             json_dumps_params={'indent': 2},
+#                             status=200)
 
 
-def view_404(request, exception=None):
-    return redirect('/')
+# def view_404(request, exception=None):
+#     return redirect('/')
 
 
-def redirect_view(request, namespace, name, slug, actualurl):
-    return redirect('/' + actualurl)
+# def redirect_view(request, namespace, name, slug, actualurl):
+#     return redirect('/' + actualurl)
 
 
-def redirect_root(request, namespace, name, slug):
-    return redirect('/')
+# def redirect_root(request, namespace, name, slug):
+#     return redirect('/')
