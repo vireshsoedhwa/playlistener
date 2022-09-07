@@ -108,6 +108,22 @@ class MediaResourceSerializer(serializers.ModelSerializer):
                 newrecord.tags.add(tagObject)
         except:
             logger.info("Tags not updated")   
+
+        try:
+            newrecord.title = validated_data.get('title')
+        except:
+            logger.info("title not included")   
+
+        try:            
+            newrecord.description = validated_data.get('description')
+        except:
+            logger.info("description not included")
+
+        try:
+            newrecord.genre = validated_data.get('genre')
+        except:
+            logger.info("genre not included")
+
         newrecord.save()
         return newrecord
 
@@ -133,10 +149,21 @@ class MediaResourceSerializer(serializers.ModelSerializer):
                     logger.info(f"New tag added: {tagObject}")
                 instance.tags.add(tagObject)
         except:
-            logger.info("Tags not updated")    
-        
-        instance.title = validated_data.get('title', instance.title)
-        instance.description = validated_data.get(
-            'description', instance.description)
-        instance.genre = validated_data.get('genre', instance.genre)
+            logger.info("Tags not updated")        
+                
+        try:
+            instance.title = validated_data.get('title', instance.title)
+        except:
+            logger.info("title not updated")
+
+        try:
+            instance.description = validated_data.get('description', instance.description)
+        except:
+            logger.info("descripton not updated")
+
+        try:
+            instance.genre = validated_data.get('genre', instance.genre)
+        except:
+            logger.info("genre not updated")
+
         return instance
