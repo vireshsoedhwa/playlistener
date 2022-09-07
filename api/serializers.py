@@ -54,11 +54,11 @@ class MediaResourceSerializer(serializers.ModelSerializer):
             try:
                 if(type(tempaudiofile) is InMemoryUploadedFile):
                     file_type = magic.from_buffer(
-                        tempaudiofile.read(2048), mime=True)
+                        tempaudiofile.read(2048), mime=False)
                     file_hash = create_hash_from_memory(tempaudiofile)
                 elif(type(tempaudiofile) is TemporaryUploadedFile):
                     file_type = magic.from_file(
-                        tempaudiofile.temporary_file_path(), mime=True)
+                        tempaudiofile.temporary_file_path(), mime=False)
                     file_hash = create_hash_from_file(
                         tempaudiofile.temporary_file_path())
             except Exception as e:
@@ -66,7 +66,7 @@ class MediaResourceSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     tempaudiofile.name + " Could not be Validated")
 
-            if 'audio/mpeg' not in file_type:
+            if 'Audio file' not in file_type:
                 raise serializers.ValidationError(
                     tempaudiofile.name + " is not a valid MP3 file")
 
@@ -88,12 +88,42 @@ class MediaResourceSerializer(serializers.ModelSerializer):
             'audiofile', newrecord.audiofile)
         newrecord.md5_generated = validated_data.get(
             'md5_generated')
-        artist_data = validated_data.get('artists')
-        tag_data = validated_data.get('tags')
-        for tag in tag_data:
-            newrecord.tags.add(tag)
-        for artist in artist_data:
-            newrecord.artists.add(artist)
+        try:
+            artist_data = validated_data.get('artists')
+            for artist in artist_data:
+                # first lookup if the artist exists if not then create it
+                artistObject, created = Artist.objects.get_or_create(name=artist.lower())
+                if created:
+                    logger.info(f"New artist added: {artistObject}")
+                newrecord.artists.add(artistObject)
+        except:
+            logger.info("Artists not updated")
+        try:
+            tag_data = validated_data.get('tags')
+            for tag in tag_data:
+                # first lookup if the tag exists if not then create it
+                tagObject, created = Tag.objects.get_or_create(name=tag.lower())
+                if created:
+                    logger.info(f"New tag added: {tagObject}")
+                newrecord.tags.add(tagObject)
+        except:
+            logger.info("Tags not updated")   
+
+        try:
+            newrecord.title = validated_data.get('title')
+        except:
+            logger.info("title not included")   
+
+        try:            
+            newrecord.description = validated_data.get('description')
+        except:
+            logger.info("description not included")
+
+        try:
+            newrecord.genre = validated_data.get('genre')
+        except:
+            logger.info("genre not included")
+
         newrecord.save()
         return newrecord
 
@@ -119,10 +149,21 @@ class MediaResourceSerializer(serializers.ModelSerializer):
                     logger.info(f"New tag added: {tagObject}")
                 instance.tags.add(tagObject)
         except:
-            logger.info("Tags not updated")    
-        
-        instance.title = validated_data.get('title', instance.title)
-        instance.description = validated_data.get(
-            'description', instance.description)
-        instance.genre = validated_data.get('genre', instance.genre)
+            logger.info("Tags not updated")        
+                
+        try:
+            instance.title = validated_data.get('title', instance.title)
+        except:
+            logger.info("title not updated")
+
+        try:
+            instance.description = validated_data.get('description', instance.description)
+        except:
+            logger.info("descripton not updated")
+
+        try:
+            instance.genre = validated_data.get('genre', instance.genre)
+        except:
+            logger.info("genre not updated")
+
         return instance

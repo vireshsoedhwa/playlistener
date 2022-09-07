@@ -45,12 +45,12 @@ class MediaResource(models.Model):
                                  null=True,
                                  blank=True,
                                  max_length=500)
-    original_duration = models.DurationField(null=True, blank=True)
+    audiofile_duration = models.DurationField(null=True, blank=True)
     audiofile_432 = models.FileField(upload_to=file_directory_path,
                                      null=True,
                                      blank=True,
                                      max_length=500)
-    converted_432_duration = models.DurationField(null=True, blank=True)
+    audiofile_432_duration = models.DurationField(null=True, blank=True)
     md5_generated = models.TextField(max_length=32, null=True, blank=True)
     genre = models.TextField(max_length=100, null=True, blank=True)
     artists = models.ManyToManyField(
@@ -62,8 +62,6 @@ class MediaResource(models.Model):
         return str(self.id) + " : " + str(os.path.basename(self.audiofile.name)) + " : " + str(self.title)
 
 # signal for deleting
-
-
 @receiver(post_delete, sender=MediaResource, dispatch_uid="delete_record")
 def delete_mediasource_record(sender, instance, **kwargs):
     logger.info(f"Deleting record id#: {instance.id}")
