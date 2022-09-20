@@ -34,7 +34,6 @@ RUN set -ex; \
     apt-get clean; \
     mkdir -p /run/daphne;
 
-COPY .env ./
 COPY manage.py supervisord.conf ./
 COPY docker-entrypoint.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
