@@ -1,32 +1,50 @@
-FROM python:3.10-slim-buster
+FROM python:3.10-slim-buster as base
 
 ENV PYTHONUNBUFFERED 1
-ENV PATH /code:/opt/venv/bin:$PATH
-
-WORKDIR /code
+# ENV PATH /code:/opt/venv/bin:$PATH
+ENV PATH="/opt/venv/bin:/base:$PATH"
 
 COPY requirements.txt ./
 
 RUN set -ex; \
-        apt-get update; \
-        apt-get install -y --no-install-recommends \
-            build-essential \
-            ffmpeg \
-            gdal-bin \
-            libmagic1 \
-        ; \
+        # apt-get update; \
+        # apt-get install -y --no-install-recommends \
+        #     build-essential \
+        #     ffmpeg \
+        #     gdal-bin \
+        #     libmagic1; \
         python -m venv /opt/venv; \
         pip install --upgrade pip; \
         pip install -r requirements.txt;
 
-RUN mkdir -p /run/daphne
 
+FROM python:3.10-slim-buster as release
+
+ENV PYTHONUNBUFFERED 1
+ENV PATH /code:/opt/venv/bin:$PATH
+WORKDIR /code
+
+RUN set -ex; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        ffmpeg \
+        gdal-bin \
+        libmagic1; \
+    apt-get autoremove -y; \
+    apt-get clean; \
+    mkdir -p /run/daphne;
+
+COPY .env ./
 COPY manage.py supervisord.conf ./
 COPY docker-entrypoint.sh /usr/local/bin
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+COPY --from=base /root/.cache /root/.cache
+COPY --from=base /opt/venv /opt/venv
+
 COPY playlistenerapi playlistenerapi
 COPY api api
 
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-
+EXPOSE 8000
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["supervisord", "-c", "supervisord.conf", "-n"]
