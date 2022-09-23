@@ -11,6 +11,7 @@ services:
       playlistener-network:
 
   app:
+    command: python manage.py runserver 0.0.0.0:8000
     image: playlistenerapi
     build:
       context: .
@@ -18,11 +19,19 @@ services:
       - .env
     depends_on:
       - apidb
+    volumes:
+      - .:/code
+    environment:
+      - DEBUG=1
+      - PRODUCTION=0
+    ports:
+      - "8000:8000"
+    networks:
+      playlistener-network:    
 
 volumes:
   dataapi:
-    external: true
-  webassets: 
+    # external: true
 
 networks:
   playlistener-network:
