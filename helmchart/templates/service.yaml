@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: plapi-svc
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: plapiapp
+  ports:
+  - name: plapiapp
+    protocol: TCP
+    port: 8000
+    targetPort: 80

@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plapiprod
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: plapiapp
+  template:
+    metadata:
+      labels:
+        app: plapiapp
+    spec:
+      containers:
+        - name: plapiapp
+          image: {{ .Values.image }}
