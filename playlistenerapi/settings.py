@@ -24,7 +24,6 @@ SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 ADMIN_USERNAME = os.environ["ADMIN_USERNAME"]
 ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
 DEBUG = os.getenv('DEBUG', False) == '1'
-PRODUCTION = os.getenv('PRODUCTION', False) == '1'
 
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['*']
@@ -45,7 +44,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'django_q',
-    'channels',
     
     'api'
 ]
@@ -78,7 +76,7 @@ TEMPLATES = [
     },
 ]
 
-ASGI_APPLICATION = "playlistenerapi.asgi.application"
+WSGI_APPLICATION = 'playlistenerapi.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases

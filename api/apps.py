@@ -12,12 +12,9 @@ class ApiConfig(AppConfig):
 
         if 'runserver' in sys.argv or 'playlistenerapi.asgi:application' in sys.argv:
             print("DEBUG: " + str(settings.DEBUG))
-            print("PRODUCTION: " + str(settings.PRODUCTION))
-            print("GO_PIPELINE_LABEL: " + str(settings.GO_PIPELINE_LABEL))
             print("api has started")
 
             
-
             from django.contrib.auth.models import User
 
             if not User.objects.filter(username=settings.ADMIN_USERNAME).exists():

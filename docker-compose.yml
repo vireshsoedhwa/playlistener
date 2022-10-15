@@ -5,25 +5,31 @@ services:
     image: postgres:alpine
     volumes:
       - dataapi:/var/lib/postgresql/data
-    env_file:
-      - .env
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
     networks:
       playlistener-network:
 
   app:
-    command: python manage.py runserver 0.0.0.0:8000
+    # command: python manage.py runserver 0.0.0.0:8000
     image: playlistenerapi
     build:
       context: .
-    env_file:
-      - .env
     depends_on:
       - apidb
     volumes:
       - .:/code
     environment:
-      - DEBUG=1
-      - PRODUCTION=0
+      # - DEBUG=1
+      - DJANGO_SECRET_KEY=654564ytffff55474fjddgdg
+      - POSTGRES_HOST=apidb
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=admin
     ports:
       - "8000:8000"
     networks:
