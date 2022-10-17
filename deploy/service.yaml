@@ -1,7 +1,24 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: app-svc
+  name: app-proxy-svc
+  namespace: plweb
+spec:
+  selector:
+    app: plapi-proxy
+  ports:
+  - name: plapi-proxy
+    protocol: TCP
+    port: 80
+    targetPort: 80
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: plapi-proxy
   namespace: plapi
 spec:
   selector:

@@ -23,7 +23,7 @@ spec:
           - name: NGINX_PORT
             value: "80"
           - name: NGINX_PROXY_HOST
-            value: "app-svc"
+            value: "plapi-proxy"
           - name: NGINX_PROXY_PORT
             value: "80"
           resources:
