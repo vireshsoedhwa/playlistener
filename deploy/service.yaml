@@ -22,9 +22,9 @@ metadata:
   namespace: plapi
 spec:
   selector:
-    app: app
+    app: plapi-app
   ports:
-  - name: app
+  - name: plapi-app
     protocol: TCP
     port: 80
     targetPort: 8000
@@ -35,13 +35,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: db-svc
+  name: plapi-db-svc
   namespace: plapi
 spec:
   selector:
-    app: db
+    app: plapi-db
   ports:
-  - name: db
+  - name: plapi-db
     protocol: TCP
     port: 5432
     targetPort: 5432

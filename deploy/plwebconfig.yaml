@@ -4,5 +4,5 @@ metadata:
   name: plapi-config
   namespace: plapi
 data:
-  POSTGRES_HOST: db-svc
+  POSTGRES_HOST: plapi-db-svc
   POSTGRES_DB: postgres

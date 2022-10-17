@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app
+  name: plapi-app
   namespace: plapi
 spec:
   selector:
     matchLabels:
-      app: app
+      app: plapi-app
   template:
     metadata:
       labels:
-        app: app
+        app: plapi-app
     spec:
       volumes:
       - name: webassets
@@ -20,7 +20,7 @@ spec:
         persistentVolumeClaim:
           claimName: plapidata
       containers:
-        - name: app
+        - name: plapi-app
           image: registry.wieru.com/plapi:latest
           resources:
             requests:
@@ -44,23 +44,23 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: db
+  name: plapi-db
   namespace: plapi
 spec:
   selector:
     matchLabels:
-      app: db
+      app: plapi-db
   template:
     metadata:
       labels:
-        app: db
+        app: plapi-db
     spec:
       volumes:
       - name: dbvolume
         persistentVolumeClaim:
           claimName: plapidb
       containers:
-        - name: db
+        - name: plapi-db
           image: postgres:alpine
           resources:
             requests:
