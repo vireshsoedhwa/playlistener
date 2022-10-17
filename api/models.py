@@ -64,9 +64,9 @@ class MediaResource(models.Model):
 # signal for deleting
 @receiver(post_delete, sender=MediaResource, dispatch_uid="delete_record")
 def delete_mediasource_record(sender, instance, **kwargs):
-    logger.info(f"Deleting record id#: {instance.id}")
+    logger.info(f"Deleting record id#: {instance.id} - {instance.title}")
     try:
         shutil.rmtree(settings.MEDIA_ROOT + str(instance.id))
-        logger.info(f"Files deleted id#: {instance.id} ")
+        logger.info(f"Files deleted id#: {instance.id} - {instance.title}")
     except:
         logger.error("Files could not be deleted")
