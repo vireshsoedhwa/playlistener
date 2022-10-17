@@ -13,7 +13,7 @@ services:
       playlistener-network:
 
   app:
-    # command: python manage.py runserver 0.0.0.0:8000
+    command: python manage.py runserver 0.0.0.0:8000
     image: playlistenerapi
     build:
       context: .
@@ -22,7 +22,7 @@ services:
     volumes:
       - .:/code
     environment:
-      # - DEBUG=1
+      - DEBUG=1
       - DJANGO_SECRET_KEY=654564ytffff55474fjddgdg
       - POSTGRES_HOST=apidb
       - POSTGRES_PASSWORD=postgres
