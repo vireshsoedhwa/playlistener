@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-proxy
+  name: plapi-proxy
   namespace: plapi
 spec:
   selector:
     matchLabels:
-      app: app-proxy
+      app: plapi-proxy
   template:
     metadata:
       labels:
-        app: app-proxy
+        app: plapi-proxy
     spec:
       volumes:
       - name: webassets
         persistentVolumeClaim:
           claimName: plapiassets
       containers:
-        - name: app-proxy
+        - name: plapi-proxy
           image: registry.wieru.com/proxy:latest
           env:
           - name: NGINX_PORT
