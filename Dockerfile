@@ -19,8 +19,7 @@ RUN set -ex; \
         libmagic1; \
     apt-get autoremove -y; \
     apt-get clean; 
-    # mkdir -p /run/daphne;
-# COPY manage.py supervisord.conf ./
+COPY manage.py .
 COPY docker-entrypoint.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 COPY --from=base /root/.cache /root/.cache
