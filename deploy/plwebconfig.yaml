@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: plapi-config
+  namespace: plapi
+data:
+  POSTGRES_HOST: db
+  POSTGRES_DB: postgres

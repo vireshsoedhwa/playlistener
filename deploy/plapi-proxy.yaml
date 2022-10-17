@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-proxy
+  namespace: plweb
+spec:
+  selector:
+    matchLabels:
+      app: app-proxy
+  template:
+    metadata:
+      labels:
+        app: app-proxy
+    spec:
+      volumes:
+      - name: webassets
+        persistentVolumeClaim:
+          claimName: plapiassets
+      containers:
+        - name: app-proxy
+          image: registry.wieru.com/proxy:latest
+          env:
+          - name: NGINX_PORT
+            value: "80"
+          - name: NGINX_PROXY_HOST
+            value: "app-svc"
+          - name: NGINX_PROXY_PORT
+            value: "80"
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+          volumeMounts:
+          - mountPath: /var/www/html
+            name: webassets

@@ -30,4 +30,4 @@ COPY api api
 EXPOSE 8000
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-CMD ["gunicorn", "-w", "3", "--forwarded-allow-ips=\"*\"", "playlistenerapi.wsgi"]
+CMD ["gunicorn", "-w", "3", "-b", "0.0.0.0", "--forwarded-allow-ips=*", "playlistenerapi.wsgi"]
