@@ -7,13 +7,14 @@ logger = logging.getLogger(__name__)
 
 class ApiConfig(AppConfig):
     name = 'api'
-
     def ready(self):
 
-        if 'runserver' in sys.argv or 'playlistenerapi.asgi:application' in sys.argv:
-            print("DEBUG: " + str(settings.DEBUG))
-            print("api has started")
+        if 'runserver' in sys.argv or 'playlistenerapi.wsgi' in sys.argv:
+            logger.info("DEBUG: " + str(settings.DEBUG))
+            logger.info("plapi has started")
 
+            if 'runserver' in sys.argv:
+                logger.warn("running in DEV mode")
             
             from django.contrib.auth.models import User
 
