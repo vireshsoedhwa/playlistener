@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: plapi-proxy-svc
+  namespace: plapi
+spec:
+  selector:
+    app: plapi-proxy
+  ports:
+  - name: plapi-proxy
+    protocol: TCP
+    port: 80
+    targetPort: 80
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: plapi-svc
+  namespace: plapi
+spec:
+  selector:
+    app: plapi-app
+  ports:
+  - name: plapi-app
+    protocol: TCP
+    port: 80
+    targetPort: 8000
+  
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: plapi-db-svc
+  namespace: plapi
+spec:
+  selector:
+    app: plapi-db
+  ports:
+  - name: plapi-db
+    protocol: TCP
+    port: 5432
+    targetPort: 5432

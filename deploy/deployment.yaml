@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plapi-app
+  namespace: plapi
+spec:
+  selector:
+    matchLabels:
+      app: plapi-app
+  template:
+    metadata:
+      labels:
+        app: plapi-app
+    spec:
+      volumes:
+      - name: webassets
+        persistentVolumeClaim:
+          claimName: plapiassets
+      - name: data
+        persistentVolumeClaim:
+          claimName: plapidata
+      containers:
+        - name: plapi-app
+          image: 192.168.1.100:32000/plapi:latest
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+          envFrom:
+          - configMapRef:
+              name: plapi-config
+          - secretRef:
+              name: dbsecret
+          - secretRef:
+              name: app-secret
+          volumeMounts:
+          - mountPath: /var/www/html
+            name: webassets
+          - mountPath: /code/data
+            name: data
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plapi-db
+  namespace: plapi
+spec:
+  selector:
+    matchLabels:
+      app: plapi-db
+  template:
+    metadata:
+      labels:
+        app: plapi-db
+    spec:
+      volumes:
+      - name: dbvolume
+        persistentVolumeClaim:
+          claimName: plapidb
+      containers:
+        - name: plapi-db
+          image: postgres:alpine
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+          ports:
+          - containerPort: 5432
+            protocol: TCP
+          envFrom:
+          - configMapRef:
+              name: plapi-config
+          - secretRef:
+              name: dbsecret
+          volumeMounts:
+          - mountPath: /var/lib/postgresql/data
+            name: dbvolume

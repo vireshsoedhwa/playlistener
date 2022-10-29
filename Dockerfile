@@ -18,9 +18,8 @@ RUN set -ex; \
         gdal-bin \
         libmagic1; \
     apt-get autoremove -y; \
-    apt-get clean; \
-    mkdir -p /run/daphne;
-COPY manage.py supervisord.conf ./
+    apt-get clean; 
+COPY manage.py .
 COPY docker-entrypoint.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 COPY --from=base /root/.cache /root/.cache
@@ -29,4 +28,5 @@ COPY playlistenerapi playlistenerapi
 COPY api api
 EXPOSE 8000
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["supervisord", "-c", "supervisord.conf", "-n"]
+
+CMD ["gunicorn", "-w", "3", "-b", "0.0.0.0", "--forwarded-allow-ips=*", "playlistenerapi.wsgi"]
