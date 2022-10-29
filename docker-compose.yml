@@ -33,7 +33,9 @@ services:
     ports:
       - "8000:8000"
     networks:
-      playlistener-network:    
+      playlistener-network:
+        aliases:
+          - playlistenerapi  
 
 volumes:
   dataapi:
