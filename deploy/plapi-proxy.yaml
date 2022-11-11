@@ -18,7 +18,7 @@ spec:
           claimName: plapiassets
       containers:
         - name: plapi-proxy
-          image: 192.168.1.100:32000/proxy:latest
+          image: localhost:32000/proxy:latest
           env:
           - name: NGINX_PORT
             value: "80"
