@@ -74,6 +74,12 @@ class MediaResourceSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     tempaudiofile.name + " is already recorded")
             attrs['md5_generated'] = file_hash
+
+
+            if attrs.get('title') is None:
+                # get title from audio file
+                filename = re.sub(r".mp3$", "", tempaudiofile.name)
+                attrs['title'] = filename
             return attrs
 
     class Meta:
@@ -92,10 +98,11 @@ class MediaResourceSerializer(serializers.ModelSerializer):
             artist_data = validated_data.get('artists')
             for artist in artist_data:
                 # first lookup if the artist exists if not then create it
-                artistObject, created = Artist.objects.get_or_create(name=artist.lower())
-                if created:
-                    logger.info(f"New artist added: {artistObject}")
-                newrecord.artists.add(artistObject)
+                if len(artist) > 1:
+                    artistObject, created = Artist.objects.get_or_create(name=artist.lower())
+                    if created:
+                        logger.info(f"New artist added: {artistObject}")
+                    newrecord.artists.add(artistObject)
         except:
             logger.info("Artists not updated")
         try:
@@ -133,10 +140,11 @@ class MediaResourceSerializer(serializers.ModelSerializer):
             artist_data = validated_data.get('artists')
             for artist in artist_data:
                 # first lookup if the artist exists if not then create it
-                artistObject, created = Artist.objects.get_or_create(name=artist.lower())
-                if created:
-                    logger.info(f"New artist added: {artistObject}")
-                instance.artists.add(artistObject)
+                if len(artist) > 1:
+                    artistObject, created = Artist.objects.get_or_create(name=artist.lower())
+                    if created:
+                        logger.info(f"New artist added: {artistObject}")
+                    instance.artists.add(artistObject)
         except:
             logger.info("Artists not updated")
     
