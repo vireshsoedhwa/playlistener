@@ -70,3 +70,9 @@ def delete_mediasource_record(sender, instance, **kwargs):
         logger.info(f"Files deleted id#: {instance.id} - {instance.title}")
     except:
         logger.error("Files could not be deleted")
+
+
+@receiver(post_save, sender=MediaResource, dispatch_uid="add_record")
+def postsave(sender, instance, created, raw, using, update_fields, **kwargs):
+
+    logger.info(f"file saved : {instance.audiofile}")
