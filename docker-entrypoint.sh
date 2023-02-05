@@ -7,7 +7,7 @@ if [ -z "${DJANGO_SECRET_KEY}" ];then
 fi
 
 >&2 echo "Make Database migrations"
-python manage.py makemigrations api
+python manage.py makemigrations app
 echo "-------------------------------------------------------------------------------------------\n"
 
 >&2 echo "Run Database migrations"

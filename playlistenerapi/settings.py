@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_q',
     
-    'api'
+    'app'
 ]
 
 MIDDLEWARE = [
@@ -130,6 +130,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = '/var/www/html/static/'
+
+STATICFILES_DIRS = [
+    "/code/frontend/build/static"
+]
 
 MEDIA_ROOT = '/code/data/'
 # MEDIA_URL =

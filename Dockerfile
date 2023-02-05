@@ -16,6 +16,7 @@ RUN set -ex; \
     apt-get install -y --no-install-recommends \
         ffmpeg \
         gdal-bin \
+        nginx \
         libmagic1; \
     apt-get autoremove -y; \
     apt-get clean; 
@@ -25,8 +26,8 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 COPY --from=base /root/.cache /root/.cache
 COPY --from=base /opt/venv /opt/venv
 COPY playlistenerapi playlistenerapi
-COPY api api
+COPY app app
 EXPOSE 8000
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-CMD ["gunicorn", "-w", "3", "-b", "0.0.0.0", "--forwarded-allow-ips=*", "playlistenerapi.wsgi"]
+CMD ["gunicorn", "-w", "3", "-b", "0.0.0.0:8000", "--forwarded-allow-ips=*", "playlistenerapi.wsgi"]
