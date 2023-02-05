@@ -63,7 +63,7 @@ ROOT_URLCONF = 'playlistenerapi.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'app/build'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -132,7 +132,8 @@ STATIC_URL = '/static/'
 STATIC_ROOT = '/var/www/html/static/'
 
 STATICFILES_DIRS = [
-    "/code/frontend/build/static"
+    "/code/app/build/static",
+    "/code/app/build"
 ]
 
 MEDIA_ROOT = '/code/data/'

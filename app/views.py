@@ -11,6 +11,10 @@ from .models import MediaResource
 from rest_framework.throttling import BaseThrottle, AnonRateThrottle
 from django.http import Http404, QueryDict
 
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
+from django.views.generic import TemplateView
 
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
@@ -21,6 +25,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+decorators = [never_cache]
+
+@method_decorator(decorators, name='dispatch')
+class BaseView(TemplateView):
+    template_name = 'home.html'
+    # extra_context={'version': settings.VERSION}
 
 class PostAnonRateThrottle(AnonRateThrottle):
     scope = 'post_anon'

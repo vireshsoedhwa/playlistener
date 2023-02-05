@@ -25,9 +25,12 @@ COPY docker-entrypoint.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 COPY --from=base /root/.cache /root/.cache
 COPY --from=base /opt/venv /opt/venv
+
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
+
 COPY playlistenerapi playlistenerapi
 COPY app app
 EXPOSE 8000
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-CMD ["gunicorn", "-w", "3", "-b", "0.0.0.0:8000", "--forwarded-allow-ips=*", "playlistenerapi.wsgi"]
+CMD ["gunicorn", "-w", "3", "-b", "0.0.0.0:8001", "--forwarded-allow-ips=*", "playlistenerapi.wsgi"]
