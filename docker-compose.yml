@@ -13,8 +13,14 @@ services:
       playlistener-network:
 
   app:
-    command: python manage.py runserver 0.0.0.0:8000
     image: playlistenerapi
+    command:
+      - /bin/sh
+      - -c
+      - |
+        (cd app && npm install)
+        (cd app && npm run build)
+        python manage.py runserver 0.0.0.0:8080
     build:
       context: .
     depends_on:
@@ -31,11 +37,13 @@ services:
       - ADMIN_USERNAME=admin
       - ADMIN_PASSWORD=admin
     ports:
+      - "8080:8080"
       - "8000:8000"
+      - "3000:3000"
     networks:
       playlistener-network:
         aliases:
-          - playlistenerapi  
+          - playlistenerapi
 
 volumes:
   dataapi:
