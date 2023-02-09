@@ -6,20 +6,21 @@
 <head>
   <meta charset="utf-8" name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
-  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
-  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
-  <link rel="manifest" href="{% static 'manifest.json' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static './apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static './favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static './favicon-16x16.png' %}">
+  <link rel="manifest" href="{% static './asset-manifest.json' %}">
   <title>API</title>
   {% csrf_token %}
 </head>
 
 <body>
-  <div id="root">
-  </div>
+  <h1>index page</h1>
   <main>
-    {% block content %}
-    {% endblock %}
+    <!-- {% block content %}
+    {% endblock %} -->
+    <div id="root">
+    </div>
   </main>
   <footer id="footer" style="position: fixed; bottom: 0;">
     {{ version }}

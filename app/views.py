@@ -25,11 +25,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-decorators = [never_cache]
-
+decorators = [never_cache, login_required]
 @method_decorator(decorators, name='dispatch')
 class BaseView(TemplateView):
-    template_name = 'home.html'
+    template_name = 'index.html'
     # extra_context={'version': settings.VERSION}
 
 class PostAnonRateThrottle(AnonRateThrottle):
