@@ -18,6 +18,6 @@ urlpatterns = [
     path(
         'accounts/login/',
         auth_views.LoginView.as_view(
-            template_name='index.html'),
+            template_name='login.html'),
     ),
 ]

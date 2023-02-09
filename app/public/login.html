@@ -1,0 +1,12 @@
+<!-- public/login.html -->
+{% extends 'index.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+{% load static %}
+{% csrf_token %}
+<h2>login route</h2>
+<div id="login">
+</div>
+{% endblock %}

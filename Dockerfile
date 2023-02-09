@@ -9,7 +9,7 @@ RUN set -ex; \
 
 # ============================================ WEB ASSETS BUILDER
 
-FROM node:lts-alpine as webassets-builder
+FROM node:19.6.0-slim as webassets-builder
 
 WORKDIR /app
 
