@@ -16,7 +16,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "dev": "run-when-changed --watch \"src/*\" --exec \"npm run build\""
+    "dev": "run-when-changed --watch \"src/*\" --watch \"public/*\" --watch \"./tailwind.config.js\" --exec \"npm run build\""
   },
   "proxy": "http://localhost:8080",
   "eslintConfig": {
@@ -38,6 +38,8 @@
     ]
   },
   "devDependencies": {
+    "@tailwindcss/forms": "^0.5.3",
+    "@tailwindcss/typography": "^0.5.9",
     "run-when-changed": "^2.1.0",
     "tailwindcss": "^3.2.6"
   }
