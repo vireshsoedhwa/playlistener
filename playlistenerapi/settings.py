@@ -136,6 +136,9 @@ STATICFILES_DIRS = [
     "/code/app/build"
 ]
 
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "home"
+
 MEDIA_ROOT = '/code/data/'
 # MEDIA_URL =
 FILE_UPLOAD_MAX_MEMORY_SIZE = 20971520 # 20MB

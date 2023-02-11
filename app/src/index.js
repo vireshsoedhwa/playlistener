@@ -14,10 +14,17 @@ import reportWebVitals from './reportWebVitals';
 // );
 
 const login = ReactDOM.createRoot(document.getElementById('login'));
+const home = ReactDOM.createRoot(document.getElementById('home'));
 
 login.render(
   <React.StrictMode>
     <Login />
+  </React.StrictMode>
+);
+
+home.render(
+  <React.StrictMode>
+    <App />
   </React.StrictMode>
 );
 

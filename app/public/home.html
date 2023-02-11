@@ -1,5 +1,5 @@
 <!-- home.html-->
-{% extends 'base.html' %}
+{% extends 'index.html' %}
 
 <!-- {% block title %}Home{% endblock %} -->
 
@@ -7,8 +7,8 @@
 {% load static %}
 {% csrf_token %}
 {% if user.is_authenticated %}
-  <!-- Hi {{ user.username }}!
-  <p><a href="{% url 'logout' %}">Log Out</a></p> -->
+  Hi {{ user.username }}!
+  <p><a href="{% url 'logout' %}">Log Out</a></p>
     <div id="home">
     </div>
 {% else %}

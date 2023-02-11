@@ -14,12 +14,17 @@ services:
 
   app:
     image: playlistenerapi
+    # command:
+    #   - /bin/sh
+    #   - -c
+    #   - |
+    #     (cd app && npm install)
+    #     (cd app && npm run build)
+    #     python manage.py runserver 0.0.0.0:8080
     command:
       - /bin/sh
       - -c
       - |
-        (cd app && npm install)
-        (cd app && npm run build)
         python manage.py runserver 0.0.0.0:8080
     build:
       context: .
