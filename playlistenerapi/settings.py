@@ -19,6 +19,7 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+VERSION = os.getenv("VERSION", "0.0.0")
 GO_PIPELINE_LABEL = os.getenv('GO_PIPELINE_LABEL', "dev")
 SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 ADMIN_USERNAME = os.environ["ADMIN_USERNAME"]
@@ -30,7 +31,7 @@ ALLOWED_HOSTS = ['*']
 
 CSRF_USE_SESSIONS = True
 CSRF_COOKIE_HTTPONLY = True
-
+SESSION_COOKIE_SECURE = True
 # Application definition
 
 INSTALLED_APPS = [
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django_extensions',
     'corsheaders',
     'rest_framework',
     'django_q',
@@ -136,8 +138,8 @@ STATICFILES_DIRS = [
     "/code/app/build"
 ]
 
-LOGIN_REDIRECT_URL = "home"
-LOGOUT_REDIRECT_URL = "home"
+LOGIN_REDIRECT_URL = "index"
+LOGOUT_REDIRECT_URL = "index"
 
 MEDIA_ROOT = '/code/data/'
 # MEDIA_URL =

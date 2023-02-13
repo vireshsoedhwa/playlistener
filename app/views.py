@@ -21,6 +21,8 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
+from django.conf import settings
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -28,8 +30,8 @@ logger = logging.getLogger(__name__)
 decorators = [never_cache, login_required]
 @method_decorator(decorators, name='dispatch')
 class BaseView(TemplateView):
-    template_name = 'home.html'
-    # extra_context={'version': settings.VERSION}
+    # template_name = 'index.html'
+    extra_context={'version': settings.VERSION}
 
 class PostAnonRateThrottle(AnonRateThrottle):
     scope = 'post_anon'

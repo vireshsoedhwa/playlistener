@@ -23,6 +23,10 @@ FROM python:3.10-slim-buster as release
 ENV PYTHONUNBUFFERED 1
 ENV PATH /code:/opt/venv/bin:$PATH
 WORKDIR /code
+ARG VERSION
+ENV VERSION=${VERSION:-1.0.0}
+RUN echo $VERSION > .env
+
 RUN set -ex; \
     apt-get update; \
     apt-get install -y --no-install-recommends \

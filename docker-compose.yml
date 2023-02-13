@@ -25,9 +25,11 @@ services:
       - /bin/sh
       - -c
       - |
-        python manage.py runserver 0.0.0.0:8080
+        python manage.py runserver_plus 0.0.0.0:8080 --cert-file cert.crt
     build:
       context: .
+      args:
+        - VERSION=dev
     depends_on:
       - apidb
     volumes:

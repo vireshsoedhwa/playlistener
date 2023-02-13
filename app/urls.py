@@ -12,8 +12,8 @@ router.register(r'mediaresources', MediaResourceViewSet,
                 basename="mediaresources")
 
 urlpatterns = [
-    path('', BaseView.as_view(template_name='home.html'), name='home'),
-    # path('', include(router.urls)),
+    path('', BaseView.as_view(template_name='index.html'), name='index'),
+    path('', include(router.urls)),
     # path("accounts/", include("django.contrib.auth.urls")),
     path(
         'accounts/logout/',
@@ -21,6 +21,6 @@ urlpatterns = [
     path(
         'accounts/login/',
         auth_views.LoginView.as_view(
-            template_name='login.html'),
+            template_name='index.html'),
     ),
 ]

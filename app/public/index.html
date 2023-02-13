@@ -10,16 +10,13 @@
   <link rel="icon" type="image/png" sizes="32x32" href="{% static './favicon-32x32.png' %}">
   <link rel="icon" type="image/png" sizes="16x16" href="{% static './favicon-16x16.png' %}">
   <link rel="manifest" href="{% static './asset-manifest.json' %}">
-  <title>API</title>
+  <title>PLAPI</title>
   {% csrf_token %}
 </head>
 
 <body>
-  <h1>index html</h1>
-  <main>
-    {% block content %}
-    {% endblock %}
-  </main>
+  <!-- <h1>index html</h1> -->
+  <div id="root"></div>
   <footer id="footer" style="position: fixed; bottom: 0;">
     {{ version }}
   </footer>
