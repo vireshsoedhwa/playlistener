@@ -13,7 +13,7 @@ import RequireAuth from './components/RequireAuth';
 function App() {
   return (
     <>
-      <nav>
+      {/* <nav>
         <ul>
           <li>
             <Link to="/">Home</Link>
@@ -22,10 +22,9 @@ function App() {
             <Link to="/accounts/login/">Log in</Link>
           </li>
         </ul>
-      </nav>
+      </nav> */}
       <Routes>
-        {/* <Route path="/accounts/login/" element={<Login />} /> */}
-        <Route path="/" element={<Outlet />} >
+        <Route path="/" element={<Layout />} >
           {/* public routes */}
           <Route path="/accounts" element={<Outlet />} >
             <Route path="login" element={<Login />} />
@@ -33,10 +32,7 @@ function App() {
           </Route>
           <Route path="unauthorized" element={<Unauthorized />} />
 
-          {/* protected routes */}
-          {/* <Route element={<RequireAuth />}>
-          </Route> */}
-            <Route path="" element={<Home />} />
+          <Route path="" element={<Home />} />
 
           {/* missing */}
           <Route path="*" element={<Missing />} />
