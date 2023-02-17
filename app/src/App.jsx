@@ -8,8 +8,6 @@ import Missing from './components/Missing'
 
 import Layout from './components/Layout'
 
-import RequireAuth from './components/RequireAuth';
-
 function App() {
   return (
     <>
