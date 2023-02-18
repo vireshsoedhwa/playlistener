@@ -8,7 +8,7 @@ export default class Api {
         this.api_url = process.env.REACT_APP_API_ENDPOINT;
     }
 
-    init = () => {
+    init = (params) => {
         // this.api_token = getCookie("ACCESS_TOKEN");
 
         // let headers = {
@@ -20,8 +20,9 @@ export default class Api {
         // if (this.api_token) {
         //   headers.Authorization = `Bearer ${this.api_token}`;
         // }
+        let thisrequest = '/mediaresources/' + params
 
-        this.client = fetch('/mediaresources/', {
+        this.client = fetch(thisrequest, {
             method: 'get',
             mode: 'same-origin',
             credentials: 'same-origin',
@@ -31,23 +32,25 @@ export default class Api {
                 'X-CSRFTOKEN': document.querySelector('[name=csrfmiddlewaretoken]').value
             },
             redirect: 'follow'
-        }).then(response => {
-            if (response.ok) {
-                return response.json()
-            }
         })
-            .then(data => {
-                console.log(data)
-                return data
-            })
-            .catch(error => {
-                console.error(error)
-            })
+        // }).then(response => {
+        //     if (response.ok) {
+        //         return response.json()
+        //     }
+        // })
+        //     .then(data => {
+        //         console.log(data)
+        //         value = data
+        //         // return data
+        //     })
+        //     .catch(error => {
+        //         console.error(error)
+        //     })
+        return this.client
     }
 
     getMediaResourcesList = (params) => {
-
-        return this.init()
+        return this.init(params)
     }
 }
     //   getUserList = (params) => {

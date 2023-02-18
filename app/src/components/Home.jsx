@@ -8,39 +8,19 @@ export default function Home() {
     const api = new Api();
 
     useEffect(() => {
-        // console.log("waaa")
-        // listupdate()
-        let response = api
-        .getMediaResourcesList()
-        console.log("reposne")
-        console.log(response)
+
+        api.getMediaResourcesList(1).then(response => {
+            if (response.ok) {
+                return response.json()
+            }
+        }).then(prop => {
+            console.log("heheh")
+            console.log(prop)
+        }).catch(error => {
+            console.error(error)
+        })
     }, [])
 
-    // const listupdate = () => {
-    //     fetch('/mediaresources/', {
-    //         method: 'get',
-    //         mode: 'same-origin',
-    //         credentials: 'same-origin',
-    //         headers: {
-    //             'Access-Control-Allow-Origin': '*',
-    //             'Content-Type': 'application/json',
-    //             'X-CSRFTOKEN': document.querySelector('[name=csrfmiddlewaretoken]').value
-    //         },
-    //         redirect: 'follow'
-    //     })
-    //         .then(response => {
-    //             if (response.ok) {
-    //                 console.log("")
-    //                 return response.json()
-    //             }
-    //         })
-    //         .then(data => {
-    //             console.log(data)
-    //         })
-    //         .catch(error => {
-    //             console.error(error)
-    //         })
-    // }
 
     // function MediaList(props) {
     //     const listofmedia = props.listofmedia
