@@ -11,18 +11,8 @@ import Layout from './components/Layout'
 function App() {
   return (
     <>
-      {/* <nav>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/accounts/login/">Log in</Link>
-          </li>
-        </ul>
-      </nav> */}
       <Routes>
-        <Route path="/" element={<Layout />} >
+        <Route path="/" element={<Outlet />} >
           {/* public routes */}
           <Route path="/accounts" element={<Outlet />} >
             <Route path="login" element={<Login />} />

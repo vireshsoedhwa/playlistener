@@ -1,5 +1,3 @@
-
-
 export default class Api {
 
     constructor() {
@@ -20,7 +18,10 @@ export default class Api {
         // if (this.api_token) {
         //   headers.Authorization = `Bearer ${this.api_token}`;
         // }
-        let thisrequest = '/mediaresources/' + params
+        let thisrequest = '/mediaresources/' 
+        if (params) {
+            thisrequest += params
+        }
 
         this.client = fetch(thisrequest, {
             method: 'get',
@@ -33,19 +34,6 @@ export default class Api {
             },
             redirect: 'follow'
         })
-        // }).then(response => {
-        //     if (response.ok) {
-        //         return response.json()
-        //     }
-        // })
-        //     .then(data => {
-        //         console.log(data)
-        //         value = data
-        //         // return data
-        //     })
-        //     .catch(error => {
-        //         console.error(error)
-        //     })
         return this.client
     }
 
@@ -53,35 +41,3 @@ export default class Api {
         return this.init(params)
     }
 }
-    //   getUserList = (params) => {
-    //     return this.init().get("/users", { params: params });
-    //   };
-
-
-
-
-//     fetch('/mediaresources/', {
-//         method: 'get',
-//         mode: 'same-origin',
-//         credentials: 'same-origin',
-//         headers: {
-//             'Access-Control-Allow-Origin': '*',
-//             'Content-Type': 'application/json',
-//             'X-CSRFTOKEN': document.querySelector('[name=csrfmiddlewaretoken]').value
-//         },
-// redirect: 'follow'
-//     })
-//         .then(response => {
-//     if (response.ok) {
-//         console.log("")
-//         return response.json()
-//     }
-// })
-//     .then(data => {
-//         // console.log(data)
-//         return data
-//     })
-//     .catch(error => {
-//         console.error(error)
-//     })
-// }

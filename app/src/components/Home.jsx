@@ -1,4 +1,3 @@
-import '../App.css';
 import MediaResource from './MediaResource';
 import React, { Fragment, useEffect, useState, useRef } from 'react';
 
@@ -6,46 +5,41 @@ import Api from '../data';
 
 export default function Home() {
     const api = new Api();
-
+    const [Data, setData] = useState(null);
     useEffect(() => {
-
-        api.getMediaResourcesList(1).then(response => {
+        api.getMediaResourcesList().then(response => {
             if (response.ok) {
                 return response.json()
             }
         }).then(prop => {
-            console.log("heheh")
-            console.log(prop)
+            setData(prop)
         }).catch(error => {
-            console.error(error)
+            // console.error(error)
         })
     }, [])
 
-
-    // function MediaList(props) {
-    //     const listofmedia = props.listofmedia
-    //     if (listofmedia == null) {
-    //         return
-    //     }
-    //     const listItems = listofmedia.map((media, index) =>
-    //         <div key={media.id}>
-    //             {props.filter != media.youtube_id ?
-    //                 <YoutubeMediadetail data={media} listupdate={props.listupdate} delete_item={props.delete_item} retry={props.retry} archive={props.archive}/>
-    //                 :
-    //                 <div></div>
-    //             }
-    //         </div>
-    //     );
-    //     return (
-    //         <Stack spacing={1}>{listItems}</Stack>
-    //     );
-    // }
-
+    function MediaList(props) {
+        const listofmedia = props.listofmedia
+        if (listofmedia == null) {
+            return
+        }
+        const listItems = listofmedia.map((media, index) =>
+            <li key={media.id}>
+                {media.title}
+            </li>
+        );
+        return (
+            <ol class="list-decimal">
+                {listItems}
+            </ol>
+        );
+    }
 
     return (
-        <div>
+        <div class="container mx-auto">
             <p><a href="accounts/logout/">Log Out</a></p>
-            This is the home comp
+            Index:
+            <MediaList listofmedia={Data} />
         </div>
     );
 }
