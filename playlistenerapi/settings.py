@@ -204,7 +204,7 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-        'api': {
+        'app': {
             'handlers': ['console'],
             'level': 'INFO',
             'propagate': True,

@@ -15,79 +15,93 @@ import os
 import logging
 logger = logging.getLogger(__name__)
 
-class TagListingField(serializers.RelatedField):
-    def to_representation(self, value):
-        return f'{value.name}'
+# class TagListingField(serializers.RelatedField):
+#     def to_representation(self, value):
+#         return f'{value.name}'
 
-    def to_internal_value(self, data):
-        return data
+#     def to_internal_value(self, data):
+#         return data
 
 
+# class ArtistListingField(serializers.RelatedField):
+#     def to_representation(self, value):
+#         return f'{value.name}'
 
-class ArtistListingField(serializers.RelatedField):
-    def to_representation(self, value):
-        return f'{value.name}'
-
-    def to_internal_value(self, data):
-        return data
+#     def to_internal_value(self, data):
+#         return data
 
 
 class MediaResourceSerializer(serializers.ModelSerializer):
-    audiofile = serializers.FileField(
+    # audiofiles = serializers.ListField(
+    #     child=serializers.FileField(max_length=None,
+    #                                 allow_empty_file=False,
+    #                                 use_url=False)
+    # )
+    file = serializers.FileField(
         max_length=None, allow_empty_file=False, use_url=False)
-    artists = ArtistListingField(many=True, queryset=Artist.objects.all())
-    tags = TagListingField(many=True, queryset=Tag.objects.all())
-    title = serializers.CharField(
-        max_length=500, min_length=None, allow_blank=True, required=False, trim_whitespace=True)
-    description = serializers.CharField(
-        max_length=5000, min_length=None, allow_blank=True, required=False, trim_whitespace=True)
-    genre = serializers.CharField(
-        max_length=100, min_length=None, allow_blank=True, required=False, trim_whitespace=True)
+    # artists = ArtistListingField(many=True, queryset=Artist.objects.all())
+    # tags = TagListingField(many=True, queryset=Tag.objects.all())
+    # title = serializers.CharField(
+    #     max_length=500, min_length=None, allow_blank=True, required=False, trim_whitespace=True)
+    # description = serializers.CharField(
+    #     max_length=5000, min_length=None, allow_blank=True, required=False, trim_whitespace=True)
+    # genre = serializers.CharField(
+    #     max_length=100, min_length=None, allow_blank=True, required=False, trim_whitespace=True)
+
     def validate(self, attrs):
-        tempaudiofile = attrs.get(
-            'audiofile')
-        if tempaudiofile is None:
-            return attrs
-        else:
-            file_type = None
-            file_hash = None
-            try:
-                if(type(tempaudiofile) is InMemoryUploadedFile):
-                    file_type = magic.from_buffer(
-                        tempaudiofile.read(2048), mime=False)
-                    file_hash = create_hash_from_memory(tempaudiofile)
-                elif(type(tempaudiofile) is TemporaryUploadedFile):
-                    file_type = magic.from_file(
-                        tempaudiofile.temporary_file_path(), mime=False)
-                    file_hash = create_hash_from_file(
-                        tempaudiofile.temporary_file_path())
-            except Exception as e:
-                logger.error(e)
-                raise serializers.ValidationError(
-                    tempaudiofile.name + " Could not be Validated")
 
-            if 'Audio file' not in file_type:
-                raise serializers.ValidationError(
-                    tempaudiofile.name + " is not a valid MP3 file")
+        logger.info("validate this ")
 
-            if MediaResource.objects.filter(md5_generated=file_hash).exists():
-                raise serializers.ValidationError(
-                    tempaudiofile.name + " is already recorded")
-            attrs['md5_generated'] = file_hash
+        # tempaudiofile = attrs.get(
+        #     'audiofile')
+        # if tempaudiofile is None:
+        #     return attrs
+        # else:
+        #     file_type = None
+        #     file_hash = None
+        #     try:
+        #         if(type(tempaudiofile) is InMemoryUploadedFile):
+        #             file_type = magic.from_buffer(
+        #                 tempaudiofile.read(2048), mime=False)
+        #             file_hash = create_hash_from_memory(tempaudiofile)
+        #         elif(type(tempaudiofile) is TemporaryUploadedFile):
+        #             file_type = magic.from_file(
+        #                 tempaudiofile.temporary_file_path(), mime=False)
+        #             file_hash = create_hash_from_file(
+        #                 tempaudiofile.temporary_file_path())
+        #     except Exception as e:
+        #         logger.error(e)
+        #         raise serializers.ValidationError(
+        #             tempaudiofile.name + " Could not be Validated")
 
+        #     if 'Audio file' not in file_type:
+        #         raise serializers.ValidationError(
+        #             tempaudiofile.name + " is not a valid MP3 file")
 
-            if attrs.get('title') is None:
-                # get title from audio file
-                filename = re.sub(r".mp3$", "", tempaudiofile.name)
-                attrs['title'] = filename
-            return attrs
+        #     if MediaResource.objects.filter(md5_generated=file_hash).exists():
+        #         raise serializers.ValidationError(
+        #             tempaudiofile.name + " is already recorded")
+        #     attrs['md5_generated'] = file_hash
+
+        #     if attrs.get('title') is None:
+        #         # get title from audio file
+        #         filename = re.sub(r".mp3$", "", tempaudiofile.name)
+        #         attrs['title'] = filename
+        return attrs
 
     class Meta:
         model = MediaResource
-        fields = ['id', 'title', 'description', 'genre', 'artists', 'tags',
-                  'audiofile', 'created_at']
+        fields = ['file']
+
 
     def create(self, validated_data):
+
+        print("creating new record")
+        return None
+
+'''
+    def create(self, validated_data):
+        logger.info("create this ")
         newrecord = MediaResource.objects.create()
         newrecord.save()
         newrecord.audiofile = validated_data.get(
@@ -99,7 +113,8 @@ class MediaResourceSerializer(serializers.ModelSerializer):
             for artist in artist_data:
                 # first lookup if the artist exists if not then create it
                 if len(artist) > 1:
-                    artistObject, created = Artist.objects.get_or_create(name=artist.lower())
+                    artistObject, created = Artist.objects.get_or_create(
+                        name=artist.lower())
                     if created:
                         logger.info(f"New artist added: {artistObject}")
                     newrecord.artists.add(artistObject)
@@ -109,19 +124,20 @@ class MediaResourceSerializer(serializers.ModelSerializer):
             tag_data = validated_data.get('tags')
             for tag in tag_data:
                 # first lookup if the tag exists if not then create it
-                tagObject, created = Tag.objects.get_or_create(name=tag.lower())
+                tagObject, created = Tag.objects.get_or_create(
+                    name=tag.lower())
                 if created:
                     logger.info(f"New tag added: {tagObject}")
                 newrecord.tags.add(tagObject)
         except:
-            logger.info("Tags not updated")   
+            logger.info("Tags not updated")
 
         try:
             newrecord.title = validated_data.get('title')
         except:
-            logger.info("title not included")   
+            logger.info("title not included")
 
-        try:            
+        try:
             newrecord.description = validated_data.get('description')
         except:
             logger.info("description not included")
@@ -135,37 +151,40 @@ class MediaResourceSerializer(serializers.ModelSerializer):
         return newrecord
 
     def update(self, instance, validated_data):
-
+        logger.info("update this ")
         try:
             artist_data = validated_data.get('artists')
             for artist in artist_data:
                 # first lookup if the artist exists if not then create it
                 if len(artist) > 1:
-                    artistObject, created = Artist.objects.get_or_create(name=artist.lower())
+                    artistObject, created = Artist.objects.get_or_create(
+                        name=artist.lower())
                     if created:
                         logger.info(f"New artist added: {artistObject}")
                     instance.artists.add(artistObject)
         except:
             logger.info("Artists not updated")
-    
+
         try:
             tag_data = validated_data.get('tags')
             for tag in tag_data:
                 # first lookup if the tag exists if not then create it
-                tagObject, created = Tag.objects.get_or_create(name=tag.lower())
+                tagObject, created = Tag.objects.get_or_create(
+                    name=tag.lower())
                 if created:
                     logger.info(f"New tag added: {tagObject}")
                 instance.tags.add(tagObject)
         except:
-            logger.info("Tags not updated")        
-                
+            logger.info("Tags not updated")
+
         try:
             instance.title = validated_data.get('title', instance.title)
         except:
             logger.info("title not updated")
 
         try:
-            instance.description = validated_data.get('description', instance.description)
+            instance.description = validated_data.get(
+                'description', instance.description)
         except:
             logger.info("descripton not updated")
 
@@ -175,3 +194,4 @@ class MediaResourceSerializer(serializers.ModelSerializer):
             logger.info("genre not updated")
 
         return instance
+'''

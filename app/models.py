@@ -45,12 +45,6 @@ class MediaResource(models.Model):
                                  null=True,
                                  blank=True,
                                  max_length=500)
-    audiofile_duration = models.DurationField(null=True, blank=True)
-    audiofile_432 = models.FileField(upload_to=file_directory_path,
-                                     null=True,
-                                     blank=True,
-                                     max_length=500)
-    audiofile_432_duration = models.DurationField(null=True, blank=True)
     md5_generated = models.TextField(max_length=32, null=True, blank=True)
     genre = models.TextField(max_length=100, null=True, blank=True)
     artists = models.ManyToManyField(

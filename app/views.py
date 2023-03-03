@@ -28,10 +28,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 decorators = [never_cache, login_required]
+
+
 @method_decorator(decorators, name='dispatch')
 class BaseView(TemplateView):
     # template_name = 'index.html'
-    extra_context={'version': settings.VERSION}
+    extra_context = {'version': settings.VERSION}
+
 
 class PostAnonRateThrottle(AnonRateThrottle):
     scope = 'post_anon'
@@ -47,6 +50,17 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
     serializer_class = MediaResourceSerializer
     parser_classes = (MultiPartParser, FormParser, JSONParser)
     throttle_classes = [PostAnonRateThrottle]
+
+    def create(self, request):
+        print("Create view")
+        serializer = self.get_serializer(data=request.data, many=True)
+        print("test1")
+        if serializer.is_valid(raise_exception=True):
+            print("test2")
+            result = serializer.save()
+            result.save()
+            return Response(serializer.data, status=200)
+        return Response(serializer.errors, status=500)
 
     def list(self, request):
         show = None

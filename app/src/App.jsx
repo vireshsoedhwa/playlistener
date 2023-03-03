@@ -7,20 +7,23 @@ import Register from './components/accounts/Register'
 import Missing from './components/Missing'
 
 import Layout from './components/Layout'
+import Create from './components/Create'
 
 function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Outlet />} >
+        <Route path="/" element={<Layout />} >
           {/* public routes */}
-          <Route path="/accounts" element={<Outlet />} >
+          <Route path="accounts" element={<Outlet />} >
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
           </Route>
           <Route path="unauthorized" element={<Unauthorized />} />
 
-          <Route path="" element={<Home />} />
+
+          <Route path="home" element={<Home />} />
+          <Route path="create" element={<Create />} />
 
           {/* missing */}
           <Route path="*" element={<Missing />} />
