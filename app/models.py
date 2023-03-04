@@ -39,29 +39,29 @@ class Artist(models.Model):
 
 class MediaResource(models.Model):
     id = models.AutoField(primary_key=True)
-    title = models.TextField(max_length=500, null=True, blank=True)
-    description = models.TextField(max_length=5000, null=True, blank=True)
+    # title = models.TextField(max_length=500, null=True, blank=True)
+    # description = models.TextField(max_length=5000, null=True, blank=True)
     audiofile = models.FileField(upload_to=file_directory_path,
                                  null=True,
                                  blank=True,
                                  max_length=500)
-    md5_generated = models.TextField(max_length=32, null=True, blank=True)
-    genre = models.TextField(max_length=100, null=True, blank=True)
-    artists = models.ManyToManyField(
-        Artist, related_name='artists', blank=True)
-    tags = models.ManyToManyField(Tag, related_name='artists', blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    # md5_generated = models.TextField(max_length=32, null=True, blank=True)
+    # genre = models.TextField(max_length=100, null=True, blank=True)
+    # artists = models.ManyToManyField(
+    #     Artist, related_name='artists', blank=True)
+    # tags = models.ManyToManyField(Tag, related_name='artists', blank=True)
+    # created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return str(self.id) + " : " + str(os.path.basename(self.audiofile.name)) + " : " + str(self.title)
-
+        # return str(self.id) + " : " + str(os.path.basename(self.audiofile.name)) + " : " + str(self.title)
+        return str(self.id)
 # signal for deleting
 @receiver(post_delete, sender=MediaResource, dispatch_uid="delete_record")
 def delete_mediasource_record(sender, instance, **kwargs):
-    logger.info(f"Deleting record id#: {instance.id} - {instance.title}")
+    logger.info(f"Deleting record id#: {instance.id} - {instance.audiofile}")
     try:
         shutil.rmtree(settings.MEDIA_ROOT + str(instance.id))
-        logger.info(f"Files deleted id#: {instance.id} - {instance.title}")
+        logger.info(f"Files deleted id#: {instance.id} - {instance.audiofile}")
     except:
         logger.error("Files could not be deleted")
 

@@ -15,6 +15,44 @@ import os
 import logging
 logger = logging.getLogger(__name__)
 
+
+class MediaResourceListSerializer(serializers.Serializer):
+    audiofile = serializers.ListField(
+        child=serializers.FileField(
+            max_length=None, allow_empty_file=False, use_url=False)
+    )
+
+    def create(self, validated_data):
+        files = validated_data.get('audiofile')
+        files_list = []
+        for file in files:
+            new_file = MediaResource.objects.create()
+            new_file.save()
+            new_file.audiofile = file
+            new_file.save()
+            files_list.append(new_file)
+        if files_list:
+            return files_list
+
+
+class MediaResourceSerializer(serializers.ModelSerializer):
+
+    # def create(self, validated_data):
+    #     print("creatioon")
+    #     print(validated_data)
+
+    #     mediaresource = [MediaResource(**item) for item in validated_data]
+    #     print(mediaresource)
+    #     return MediaResource.objects.bulk_create(mediaresource)
+
+    # return MediaResource(**validated_data)
+
+    class Meta:
+        model = MediaResource
+        fields = '__all__'
+
+
+'''
 # class TagListingField(serializers.RelatedField):
 #     def to_representation(self, value):
 #         return f'{value.name}'
@@ -99,7 +137,7 @@ class MediaResourceSerializer(serializers.ModelSerializer):
         print("creating new record")
         return None
 
-'''
+
     def create(self, validated_data):
         logger.info("create this ")
         newrecord = MediaResource.objects.create()

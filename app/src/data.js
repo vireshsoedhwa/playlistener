@@ -50,9 +50,10 @@ export default class Api {
         for (const [i, file] of files.entries()) {
             // console.log('%d: %s', i, value);
             // data.append(`files-${i}`, file, file.name)
-            data.append(`file`, file, file.name)
+            data.append("files[]", file, file.name)
         }
-
+        // data.append("title", "title one")
+        // data.append("title", "title two")
 
         // data.append('audiofile', files[0], files[0].name)
         // for (const file of files) {

@@ -4,7 +4,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
-from .serializers import MediaResourceSerializer
+from .serializers import MediaResourceSerializer, MediaResourceListSerializer
 
 from .models import MediaResource
 
@@ -53,12 +53,15 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         print("Create view")
-        serializer = self.get_serializer(data=request.data, many=True)
+        print(request.data)
+        print(request.user)
+        serializer = self.get_serializer(data=request.data)
         print("test1")
         if serializer.is_valid(raise_exception=True):
             print("test2")
             result = serializer.save()
-            result.save()
+            print("result")
+            print(result)
             return Response(serializer.data, status=200)
         return Response(serializer.errors, status=500)
 
@@ -110,3 +113,16 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
 
         mediaresource_serializer = self.get_serializer(mediaresource)
         return Response(mediaresource_serializer.data)
+
+    @action(detail=False, methods=['post'])
+    def multiple_uploads(self, request):
+        serializer = MediaResourceListSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            print("test2")
+            print("result")
+            result = serializer.save()
+            print("post")
+            for item in result:
+                print(item)
+            return Response("", status=200)
+        return Response(serializer.errors, status=500)
