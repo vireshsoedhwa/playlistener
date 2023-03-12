@@ -4,7 +4,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
-from .serializers import MediaResourceSerializer, MediaResourceListSerializer
+from .serializers import MediaResourceSerializer
 
 from .models import MediaResource
 
@@ -82,7 +82,7 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def partial_update(self, request, pk=None):
-
+        print("partial update")
         try:
             record_to_update = MediaResource.objects.get(pk=pk)
         except MediaResource.DoesNotExist:
@@ -116,33 +116,33 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
         mediaresource_serializer = self.get_serializer(mediaresource)
         return Response(mediaresource_serializer.data)
 
-    @action(detail=False, methods=['post'])
-    def multiple_uploads(self, request):
-        serializer = MediaResourceListSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            # result = serializer.save()
-            validated = serializer.validated_data.get('valid')
-            valid_files = []
+    # @action(detail=False, methods=['post'])
+    # def multiple_uploads(self, request):
+    #     serializer = MediaResourceListSerializer(data=request.data)
+    #     if serializer.is_valid(raise_exception=True):
+    #         # result = serializer.save()
+    #         validated = serializer.validated_data.get('valid')
+    #         valid_files = []
 
-            fileModelObjects = []
-            for file in validated:
-                filename = re.sub(r".mp3$", "", file[0].name)
-                new_file = MediaResource(
-                    title=filename,
-                    audiofile=file[0],
-                    md5_generated=file[1])
-                fileModelObjects.append(new_file)
-                valid_files.append(file[0].name)
-            MediaResource.objects.bulk_create(fileModelObjects)
+    #         fileModelObjects = []
+    #         for file in validated:
+    #             filename = re.sub(r".mp3$", "", file[0].name)
+    #             new_file = MediaResource(
+    #                 title=filename,
+    #                 audiofile=file[0],
+    #                 md5_generated=file[1])
+    #             fileModelObjects.append(new_file)
+    #             valid_files.append(file[0].name)
+    #         MediaResource.objects.bulk_create(fileModelObjects)
 
-            invalid_files = [
-                file.name for file in serializer.validated_data.get('invalid')]
+    #         invalid_files = [
+    #             file.name for file in serializer.validated_data.get('invalid')]
 
-            already_recorded_files = [
-                file.name for file in serializer.validated_data.get('already_recorded')]
+    #         already_recorded_files = [
+    #             file.name for file in serializer.validated_data.get('already_recorded')]
 
-            response = {"valid": valid_files, "invalid": invalid_files,
-                        "already_recorded": already_recorded_files}
+    #         response = {"valid": valid_files, "invalid": invalid_files,
+    #                     "already_recorded": already_recorded_files}
 
-            return Response(response, status=200)
-        return Response(serializer.errors, status=500)
+    #         return Response(response, status=200)
+    #     return Response(serializer.errors, status=500)

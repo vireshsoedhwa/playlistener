@@ -55,10 +55,11 @@ class MediaResource(models.Model):
                                  max_length=500)
     md5_generated = models.TextField(max_length=32, null=True, blank=True)
     genre = models.ForeignKey(
-        Genre, related_name='genres', blank=True, on_delete=models.RESTRICT)
+        Genre, related_name='genres', null=True, blank=True, on_delete=models.RESTRICT)
     artists = models.ManyToManyField(
         Artist, related_name='artists', blank=True)
-    tags = models.ManyToManyField(Tag, related_name='artists', blank=True)
+    tags = models.ManyToManyField(
+        Tag, related_name='artists', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
