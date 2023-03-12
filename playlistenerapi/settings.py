@@ -138,7 +138,7 @@ STATICFILES_DIRS = [
     "/code/app/build"
 ]
 
-LOGIN_REDIRECT_URL = "index"
+LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "index"
 
 MEDIA_ROOT = '/code/data/'

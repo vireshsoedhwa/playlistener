@@ -1,4 +1,3 @@
-import MediaResource from './MediaResource';
 import React, { Fragment, useEffect, useState, useRef } from 'react';
 
 import Api from '../data';
@@ -29,9 +28,9 @@ export default function Home() {
             </li>
         );
         return (
-            <ol class="list-decimal">
+            <ul class="list-disc list-inside">
                 {listItems}
-            </ol>
+            </ul>
         );
     }
 

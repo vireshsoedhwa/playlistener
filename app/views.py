@@ -23,6 +23,8 @@ from rest_framework.decorators import action
 
 from django.conf import settings
 
+import re
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -53,8 +55,8 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         print("Create view")
-        print(request.data)
-        print(request.user)
+        # print(request.data)
+        # print(request.user)
         serializer = self.get_serializer(data=request.data)
         print("test1")
         if serializer.is_valid(raise_exception=True):
@@ -118,11 +120,29 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
     def multiple_uploads(self, request):
         serializer = MediaResourceListSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            print("test2")
-            print("result")
-            result = serializer.save()
-            print("post")
-            for item in result:
-                print(item)
-            return Response("", status=200)
+            # result = serializer.save()
+            validated = serializer.validated_data.get('valid')
+            valid_files = []
+
+            fileModelObjects = []
+            for file in validated:
+                filename = re.sub(r".mp3$", "", file[0].name)
+                new_file = MediaResource(
+                    title=filename,
+                    audiofile=file[0],
+                    md5_generated=file[1])
+                fileModelObjects.append(new_file)
+                valid_files.append(file[0].name)
+            MediaResource.objects.bulk_create(fileModelObjects)
+
+            invalid_files = [
+                file.name for file in serializer.validated_data.get('invalid')]
+
+            already_recorded_files = [
+                file.name for file in serializer.validated_data.get('already_recorded')]
+
+            response = {"valid": valid_files, "invalid": invalid_files,
+                        "already_recorded": already_recorded_files}
+
+            return Response(response, status=200)
         return Response(serializer.errors, status=500)

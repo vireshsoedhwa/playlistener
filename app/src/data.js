@@ -1,3 +1,6 @@
+import axios from 'axios';
+
+
 export default class Api {
 
     constructor() {
@@ -10,7 +13,7 @@ export default class Api {
 
     }
 
-    init = (params) => {
+    MediaResourcesList = (params) => {
         // this.api_token = getCookie("ACCESS_TOKEN");
 
         // let headers = {
@@ -37,7 +40,7 @@ export default class Api {
         return this.client
     }
 
-    senderclient = (files) => {
+    senderclient = (file) => {
         // let headers = {
         //     'Access-Control-Allow-Origin': '*',
         //     'X-CSRFTOKEN': document.querySelector('[name=csrfmiddlewaretoken]').value
@@ -47,11 +50,12 @@ export default class Api {
 
         const data = new FormData();
 
-        for (const [i, file] of files.entries()) {
-            // console.log('%d: %s', i, value);
-            // data.append(`files-${i}`, file, file.name)
-            data.append("files[]", file, file.name)
-        }
+        // for (const [i, file] of files.entries()) {
+        //     // console.log('%d: %s', i, value);
+        //     // data.append(`files-${i}`, file, file.name)
+        //     data.append("audiofile", file, file.name)
+        // }
+        data.append("audiofile", file, file.name)
         // data.append("title", "title one")
         // data.append("title", "title two")
 
@@ -73,11 +77,28 @@ export default class Api {
         return this.client
     }
 
-    getMediaResourcesList = (params) => {
-        return this.init(params)
+    axiossend = (files) => {
+        // console.
+        let ax = axios({
+            method: 'post',
+            url: '/mediaresources/',
+            responseType: 'json',
+            xsrfCookieName: 'X-CSRFTOKEN',
+            onUploadProgress: function (progressEvent) {
+                // var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                // setUploadProgress(percentCompleted)
+                // console.log(percentCompleted);
+            }
+        })
+
+        return ax
     }
 
-    uploadFiles = (files) => {
-        return this.senderclient(files)
+    getMediaResourcesList = (params) => {
+        return this.MediaResourcesList(params)
+    }
+
+    uploadFiles = (file) => {
+        return this.senderclient(file)
     }
 }

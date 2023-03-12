@@ -22,30 +22,110 @@ class MediaResourceListSerializer(serializers.Serializer):
             max_length=None, allow_empty_file=False, use_url=False)
     )
 
-    def create(self, validated_data):
-        files = validated_data.get('audiofile')
-        files_list = []
-        for file in files:
-            new_file = MediaResource.objects.create()
-            new_file.save()
-            new_file.audiofile = file
-            new_file.save()
-            files_list.append(new_file)
-        if files_list:
-            return files_list
+    def validate(self, attrs):
+        logger.info("validate this ")
+        # logger.info(attrs)
+        tempaudiofile = attrs.get(
+            'audiofile')
+        if tempaudiofile is None:
+            raise serializers.ValidationError(
+                "no files uploaded")
 
+        valid_files = []
+        invalid_files = []
+        already_recorded = []
+        for index, item in enumerate(tempaudiofile):
+            print(index)
+            print(type(item))
+            file_type = None
+            file_hash = None
+            try:
+                if (type(item) is InMemoryUploadedFile):
+                    file_type = magic.from_buffer(
+                        item.read(2048), mime=False)
+                    file_hash = create_hash_from_memory(item)
+                elif (type(item) is TemporaryUploadedFile):
+                    file_type = magic.from_file(
+                        item.temporary_file_path(), mime=False)
+                    file_hash = create_hash_from_file(
+                        item.temporary_file_path())
+            except Exception as e:
+                logger.error(e)
+                invalid_files.append(item)
+                continue
+
+            # print(file_type)
+            # check mimetype
+            if 'Audio file' not in file_type:
+                print(f"{index} not an audio file")
+                print(file_type)
+                invalid_files.append(item)
+                continue
+
+            try:
+                # check if this file already exists
+                if MediaResource.objects.filter(md5_generated=file_hash).exists():
+                    print(f"{index} hash already exists")
+                    already_recorded.append(item)
+                    continue
+            except:
+                print(f"{index} failed to check hash")
+                already_recorded.append(item)
+                continue
+            valid_files.append([item, file_hash])
+
+        attrs['valid'] = valid_files
+        attrs['invalid'] = invalid_files
+        attrs['already_recorded'] = already_recorded
+        return attrs
+
+
+class TagListingField(serializers.RelatedField):
+    def to_representation(self, value):
+        return f'{value.name}'
+
+    def to_internal_value(self, data):
+        return data
+
+class ArtistListingField(serializers.RelatedField):
+    def to_representation(self, value):
+        return f'{value.name}'
+
+    def to_internal_value(self, data):
+        return data
 
 class MediaResourceSerializer(serializers.ModelSerializer):
+    def validate(self, attrs):
+        logger.info("validate this ")
+        tempaudiofile = attrs.get(
+            'audiofile')
+        if tempaudiofile is None:
+            raise serializers.ValidationError(
+                "no files uploaded")
+        file_type = None
+        file_hash = None
+        if (type(tempaudiofile) is InMemoryUploadedFile):
+            file_type = magic.from_buffer(
+                tempaudiofile.read(2048), mime=False)
+            file_hash = create_hash_from_memory(tempaudiofile)
+        elif (type(tempaudiofile) is TemporaryUploadedFile):
+            file_type = magic.from_file(
+                tempaudiofile.temporary_file_path(), mime=False)
+            file_hash = create_hash_from_file(
+                tempaudiofile.temporary_file_path())
 
-    # def create(self, validated_data):
-    #     print("creatioon")
-    #     print(validated_data)
+        if 'Audio file' not in file_type:
+            raise serializers.ValidationError(
+                "not a valid audiofile")
 
-    #     mediaresource = [MediaResource(**item) for item in validated_data]
-    #     print(mediaresource)
-    #     return MediaResource.objects.bulk_create(mediaresource)
-
-    # return MediaResource(**validated_data)
+        if MediaResource.objects.filter(md5_generated=file_hash).exists():
+            raise serializers.ValidationError(
+                "file already recorded")
+        
+        filename = re.sub(r".mp3$", "", tempaudiofile.name)
+        attrs['md5_generated'] = file_hash
+        attrs['title'] = filename
+        return attrs
 
     class Meta:
         model = MediaResource
