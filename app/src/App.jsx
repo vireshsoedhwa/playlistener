@@ -8,6 +8,7 @@ import Missing from './components/Missing'
 
 import Layout from './components/Layout'
 import Create from './components/Create'
+import Search from './components/Search';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
 
           <Route path="home" element={<Home />} />
           <Route path="create" element={<Create />} />
+          <Route path="search" element={<Search />} />
 
           {/* missing */}
           <Route path="*" element={<Missing />} />

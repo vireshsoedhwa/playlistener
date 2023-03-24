@@ -15,6 +15,7 @@ urlpatterns = [
     path('', BaseView.as_view(template_name='index.html'), name='index'),
     path('home', BaseView.as_view(template_name='index.html'), name='home'),
     path('create', BaseView.as_view(template_name='index.html'), name='create'),
+    path('search', BaseView.as_view(template_name='index.html'), name='search'),
     path('', include(router.urls)),
     # path("accounts/", include("django.contrib.auth.urls")),
     path(
