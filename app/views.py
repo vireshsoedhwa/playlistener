@@ -58,12 +58,8 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
         # print(request.data)
         # print(request.user)
         serializer = self.get_serializer(data=request.data)
-        print("test1")
         if serializer.is_valid(raise_exception=True):
-            print("test2")
             result = serializer.save()
-            print("result")
-            print(result)
             return Response(serializer.data, status=200)
         return Response(serializer.errors, status=500)
 

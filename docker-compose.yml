@@ -4,28 +4,20 @@ services:
   apidb:
     image: postgres:alpine
     volumes:
-      - dataapi:/var/lib/postgresql/data
+      - apidbvol:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_DB=postgres
-    networks:
-      playlistener-network:
 
   app:
     image: playlistenerapi
-    # command:
-    #   - /bin/sh
-    #   - -c
-    #   - |
-    #     (cd app && npm install)
-    #     (cd app && npm run build)
-    #     python manage.py runserver 0.0.0.0:8080
-    # python manage.py runserver_plus 0.0.0.0:8080 --cert-file cert.crt
     command:
       - /bin/sh
       - -c
       - |
+        (cd app && npm install)
+        (cd app && npm run build)
         python manage.py runserver 0.0.0.0:8080
     build:
       context: .
@@ -35,6 +27,7 @@ services:
       - apidb
     volumes:
       - .:/code
+      - data:/code/data
     environment:
       - DEBUG=1
       - DJANGO_SECRET_KEY=654564ytffff55474fjddgdg
@@ -48,17 +41,9 @@ services:
       - "8080:8080"
       - "8000:8000"
       - "3000:3000"
-    networks:
-      playlistener-network:
-        aliases:
-          - playlistenerapi
 
 volumes:
-  dataapi:
+  apidbvol:
     # external: true
+  data:
 
-networks:
-  playlistener-network:
-    external: true
-    driver: bridge
-    name: playlistener-network

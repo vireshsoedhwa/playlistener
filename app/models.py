@@ -7,8 +7,6 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.conf import settings
 
-# from django_q.tasks import async_task, result, fetch
-
 import shutil
 import os.path
 import logging
