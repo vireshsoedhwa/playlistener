@@ -13,9 +13,6 @@ spec:
         app: plapi-app
     spec:
       volumes:
-      - name: webassets
-        persistentVolumeClaim:
-          claimName: plapiassets
       - name: data
         persistentVolumeClaim:
           claimName: plapidata
@@ -34,8 +31,6 @@ spec:
           - secretRef:
               name: app-secret
           volumeMounts:
-          - mountPath: /var/www/html
-            name: webassets
           - mountPath: /code/data
             name: data
 

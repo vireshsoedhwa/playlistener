@@ -11,15 +11,31 @@ from .models import MediaResource
 from rest_framework.throttling import BaseThrottle, AnonRateThrottle
 from django.http import Http404, QueryDict
 
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
+from django.views.generic import TemplateView
 
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
+from django.conf import settings
+
+import re
+
 import logging
 
 logger = logging.getLogger(__name__)
+
+decorators = [never_cache, login_required]
+
+
+@method_decorator(decorators, name='dispatch')
+class BaseView(TemplateView):
+    # template_name = 'index.html'
+    extra_context = {'version': settings.VERSION}
 
 
 class PostAnonRateThrottle(AnonRateThrottle):
@@ -37,6 +53,16 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
     parser_classes = (MultiPartParser, FormParser, JSONParser)
     throttle_classes = [PostAnonRateThrottle]
 
+    def create(self, request):
+        print("Create view")
+        # print(request.data)
+        # print(request.user)
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            result = serializer.save()
+            return Response(serializer.data, status=200)
+        return Response(serializer.errors, status=500)
+
     def list(self, request):
         show = None
         if "show" in request.query_params:
@@ -52,7 +78,7 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def partial_update(self, request, pk=None):
-
+        print("partial update")
         try:
             record_to_update = MediaResource.objects.get(pk=pk)
         except MediaResource.DoesNotExist:
@@ -85,3 +111,34 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
 
         mediaresource_serializer = self.get_serializer(mediaresource)
         return Response(mediaresource_serializer.data)
+
+    # @action(detail=False, methods=['post'])
+    # def multiple_uploads(self, request):
+    #     serializer = MediaResourceListSerializer(data=request.data)
+    #     if serializer.is_valid(raise_exception=True):
+    #         # result = serializer.save()
+    #         validated = serializer.validated_data.get('valid')
+    #         valid_files = []
+
+    #         fileModelObjects = []
+    #         for file in validated:
+    #             filename = re.sub(r".mp3$", "", file[0].name)
+    #             new_file = MediaResource(
+    #                 title=filename,
+    #                 audiofile=file[0],
+    #                 md5_generated=file[1])
+    #             fileModelObjects.append(new_file)
+    #             valid_files.append(file[0].name)
+    #         MediaResource.objects.bulk_create(fileModelObjects)
+
+    #         invalid_files = [
+    #             file.name for file in serializer.validated_data.get('invalid')]
+
+    #         already_recorded_files = [
+    #             file.name for file in serializer.validated_data.get('already_recorded')]
+
+    #         response = {"valid": valid_files, "invalid": invalid_files,
+    #                     "already_recorded": already_recorded_files}
+
+    #         return Response(response, status=200)
+    #     return Response(serializer.errors, status=500)

@@ -19,6 +19,7 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+VERSION = os.getenv("VERSION", "0.0.0")
 GO_PIPELINE_LABEL = os.getenv('GO_PIPELINE_LABEL', "dev")
 SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 ADMIN_USERNAME = os.environ["ADMIN_USERNAME"]
@@ -26,11 +27,11 @@ ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
 DEBUG = os.getenv('DEBUG', False) == '1'
 
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['*']
+# CSRF_TRUSTED_ORIGINS = ['*']
 
 CSRF_USE_SESSIONS = True
 CSRF_COOKIE_HTTPONLY = True
-
+SESSION_COOKIE_SECURE = True
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,9 +44,8 @@ INSTALLED_APPS = [
 
     'corsheaders',
     'rest_framework',
-    'django_q',
     
-    'api'
+    'app'
 ]
 
 MIDDLEWARE = [
@@ -63,7 +63,7 @@ ROOT_URLCONF = 'playlistenerapi.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'app/build'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -131,6 +131,14 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = '/var/www/html/static/'
 
+STATICFILES_DIRS = [
+    "/code/app/build/static",
+    "/code/app/build"
+]
+
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "index"
+
 MEDIA_ROOT = '/code/data/'
 # MEDIA_URL =
 FILE_UPLOAD_MAX_MEMORY_SIZE = 20971520 # 20MB
@@ -194,7 +202,7 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-        'api': {
+        'app': {
             'handlers': ['console'],
             'level': 'INFO',
             'propagate': True,

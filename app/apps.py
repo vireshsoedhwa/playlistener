@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class ApiConfig(AppConfig):
-    name = 'api'
+    name = 'app'
     def ready(self):
 
         if 'runserver' in sys.argv or 'playlistenerapi.wsgi' in sys.argv:
