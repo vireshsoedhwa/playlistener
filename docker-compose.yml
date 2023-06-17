@@ -16,9 +16,9 @@ services:
       - /bin/sh
       - -c
       - |
-        (cd app && npm install)
-        (cd app && npm run build)
         python manage.py runserver 0.0.0.0:8080
+# (cd app && npm install)
+# (cd app && npm run build)
     build:
       context: .
       args:
@@ -41,6 +41,11 @@ services:
       - "8080:8080"
       - "8000:8000"
       - "3000:3000"
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
 
 volumes:
   apidbvol:

@@ -24,6 +24,13 @@ python manage.py collectstatic --noinput
 # python manage.py qcluster &
 # echo "-------------------------------------------------------------------------------------------\n"
 
+# celery -A playlistenerapi worker --loglevel=debug --detach worker_hijack_root_logger=False worker_redirect_stdouts_level=DEBUG
+
+celery -A playlistenerapi worker --detach --loglevel=DEBUG --concurrency=2 -n worker1@%h worker_hijack_root_logger=False worker_redirect_stdouts=False worker_redirect_stdouts_level=DEBUG
+
+celery -A playlistenerapi beat --detach --loglevel=DEBUG
+
+
 >&2 echo "Starting Nginx..."
 nginx
 

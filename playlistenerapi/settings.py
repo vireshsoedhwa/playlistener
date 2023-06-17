@@ -117,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Vancouver'
 
 USE_I18N = True
 
@@ -144,20 +144,20 @@ MEDIA_ROOT = '/code/data/'
 # MEDIA_URL =
 FILE_UPLOAD_MAX_MEMORY_SIZE = 20971520 # 20MB
 
-Q_CLUSTER = {
-    'name': 'myproject',
-    'max_attempts': 1,
-    'retry': 1000,
-    'workers': 8,
-    'recycle': 500,
-    'timeout': 900,
-    'compress': True,
-    'cpu_affinity': 1,
-    'save_limit': 250,
-    'queue_limit': 500,
-    'label': 'Django Q',
-    'orm': 'default'
-}
+# Q_CLUSTER = {
+#     'name': 'myproject',
+#     'max_attempts': 1,
+#     'retry': 1000,
+#     'workers': 8,
+#     'recycle': 500,
+#     'timeout': 900,
+#     'compress': True,
+#     'cpu_affinity': 1,
+#     'save_limit': 250,
+#     'queue_limit': 500,
+#     'label': 'Django Q',
+#     'orm': 'default'
+# }
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
@@ -192,9 +192,23 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'custom'
+        },
+        'celerytask': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': 'task.log',
+            'formatter': 'simple',
+            'maxBytes': 1024 * 1024 * 10,  # 100 mb
+        },        
+        'celery': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': 'celery.log',
+            'formatter': 'simple',
+            'maxBytes': 1024 * 1024 * 10,  # 100 mb
         },
     },
     'loggers': {
@@ -205,8 +219,26 @@ LOGGING = {
         },
         'app': {
             'handlers': ['console'],
-            'level': 'INFO',
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'celery.task': {
+            'handlers': ['celerytask', 'console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'celery': {
+            'handlers': ['celery', 'console'],
+            'level': 'DEBUG',
             'propagate': True,
         }
     },
 }
+
+
+# Celery Configuration Options
+CELERY_TIMEZONE = "America/Vancouver"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERYBEAT_LOG_FILE= '/code/celeryd.log'
