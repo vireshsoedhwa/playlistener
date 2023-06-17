@@ -26,12 +26,12 @@ app.autodiscover_tasks()
 # def debug_task(self):
 #     print(f'Request: {self.request!r}')
 
-# app.conf.beat_schedule = {
-#     'add-every-10-seconds': {
-#         'task': 'test',
-#         'schedule': 10.0
-#     },
-# }
+app.conf.beat_schedule = {
+    'add-every-10-seconds': {
+        'task': 'app.tasks.count_items',
+        'schedule': 10.0
+    },
+}
 
 app.conf.timezone = 'America/Vancouver'
 
@@ -41,12 +41,14 @@ def setup_periodic_tasks(sender, **kwargs):
     # Calls test('hello') every 10 seconds.
     sender.add_periodic_task(10.0, test.s('hello'), name='add every 10')
 
+    # sender.add_periodic_task(10.0, app.tasks.count_items.s(), name='add every task')
+
 
 @app.task
 def test(arg):
 
-    orglogger.debug("PLEASEEEJJEJEJE")
-    tasklogger.debug("whahhdhahd")
+    # orglogger.debug("PLEASEEEJJEJEJE")
+    tasklogger.debug("test etest ts ")
     
     print(arg)
     print("dfashfasd")

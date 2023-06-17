@@ -201,14 +201,14 @@ LOGGING = {
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': '/code/logs/task.log',
             'formatter': 'simple',
-            'maxBytes': 1024 * 1024 * 10,  # 100 mb
+            'maxBytes': 1024 * 1024 * 10,  # 10 mb
         },        
         'celery': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': '/code/logs/celery.log',
             'formatter': 'simple',
-            'maxBytes': 1024 * 1024 * 10,  # 100 mb
+            'maxBytes': 1024 * 1024 * 10,  # 10 mb
         }
     },
     'loggers': {
@@ -240,5 +240,5 @@ LOGGING = {
 CELERY_TIMEZONE = "America/Vancouver"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
-CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_BROKER_URL = 'redis://redis:6379'
 CELERYBEAT_LOG_FILE= '/code/celeryd.log'
