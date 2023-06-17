@@ -199,44 +199,39 @@ LOGGING = {
         'celerytask': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/logs/task.log',
+            'filename': '/code/logs/task.log',
             'formatter': 'simple',
             'maxBytes': 1024 * 1024 * 10,  # 100 mb
         },        
         'celery': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/logs/celery.log',
+            'filename': '/code/logs/celery.log',
             'formatter': 'simple',
             'maxBytes': 1024 * 1024 * 10,  # 100 mb
-        },
-        'consoledev': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
-        },
+        }
     },
     'loggers': {
         'django': {
             'handlers': ['console'],
             'level': 'ERROR',
-            'propagate': True,
+            'propagate': False,
         },
         'app': {
             'handlers': ['console'],
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': False,
         },
         'celery.task': {
-            'handlers': ['celerytask', 'consoledev'],
+            'handlers': ['celerytask'],
             'level': 'DEBUG',
             'propagate': True,
         },
-        # 'celery': {
-        #     'handlers': ['celery', 'console'],
-        #     'level': 'DEBUG',
-        #     'propagate': True,
-        # }
+        'celery': {
+            'handlers': ['celery'],
+            'level': 'DEBUG',
+            'propagate': True,
+        }
     },
 }
 

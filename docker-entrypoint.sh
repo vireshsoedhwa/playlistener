@@ -10,6 +10,8 @@ mkdir -p /code/logs
 # tail -f /dev/null
 touch /code/logs/task.log
 touch /code/logs/celery.log
+cat /dev/null > /code/logs/task.log
+cat /dev/null > /code/logs/celery.log
 
 >&2 echo "Make Database migrations"
 python manage.py makemigrations app
