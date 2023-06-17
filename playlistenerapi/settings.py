@@ -199,16 +199,21 @@ LOGGING = {
         'celerytask': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'task.log',
+            'filename': '/logs/task.log',
             'formatter': 'simple',
             'maxBytes': 1024 * 1024 * 10,  # 100 mb
         },        
         'celery': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'celery.log',
+            'filename': '/logs/celery.log',
             'formatter': 'simple',
             'maxBytes': 1024 * 1024 * 10,  # 100 mb
+        },
+        'consoledev': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
         },
     },
     'loggers': {
@@ -223,15 +228,15 @@ LOGGING = {
             'propagate': True,
         },
         'celery.task': {
-            'handlers': ['celerytask', 'console'],
+            'handlers': ['celerytask', 'consoledev'],
             'level': 'DEBUG',
             'propagate': True,
         },
-        'celery': {
-            'handlers': ['celery', 'console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        }
+        # 'celery': {
+        #     'handlers': ['celery', 'console'],
+        #     'level': 'DEBUG',
+        #     'propagate': True,
+        # }
     },
 }
 

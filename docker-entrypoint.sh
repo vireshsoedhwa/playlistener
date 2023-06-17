@@ -6,6 +6,11 @@ if [ -z "${DJANGO_SECRET_KEY}" ];then
   echo DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY >> .env
 fi
 
+mkdir -p /code/logs
+# tail -f /dev/null
+touch /code/logs/task.log
+touch /code/logs/celery.log
+
 >&2 echo "Make Database migrations"
 python manage.py makemigrations app
 echo "-------------------------------------------------------------------------------------------\n"
@@ -28,8 +33,7 @@ python manage.py collectstatic --noinput
 
 celery -A playlistenerapi worker --detach --loglevel=DEBUG --concurrency=2 -n worker1@%h worker_hijack_root_logger=False worker_redirect_stdouts=False worker_redirect_stdouts_level=DEBUG
 
-celery -A playlistenerapi beat --detach --loglevel=DEBUG
-
+celery -A playlistenerapi beat --detach --loglevel=DEBUG --scheduler django_celery_beat.schedulers:DatabaseScheduler
 
 >&2 echo "Starting Nginx..."
 nginx
