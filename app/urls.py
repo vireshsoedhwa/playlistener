@@ -1,9 +1,9 @@
 from django.urls import path, include
 from django.conf import settings
 from . import views
-from .views import MediaResourceViewSet
+from .views import MediaResourceViewSet, BaseView, testfunction
 from rest_framework.routers import DefaultRouter
-from .views import BaseView
+
 from django.contrib.auth import views as auth_views
 
 router = DefaultRouter()
@@ -26,4 +26,6 @@ urlpatterns = [
         auth_views.LoginView.as_view(
             template_name='index.html'),
     ),
+
+    path('test', testfunction, name='test'),
 ]

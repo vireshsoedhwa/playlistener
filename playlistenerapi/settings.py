@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'django_celery_beat',
+    'django_celery_results',
     
     'app'
 ]
@@ -242,3 +243,5 @@ CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BROKER_URL = 'redis://redis:6379'
 CELERYBEAT_LOG_FILE= '/code/celeryd.log'
+
+CELERY_RESULT_BACKEND = 'django-db'
