@@ -48,7 +48,7 @@ class MediaResourceSerializer(serializers.ModelSerializer):
     tags = TagListingField(
         many=True, queryset=Tag.objects.all(), required=False)
     genre = GenreListingField(
-        many=False, queryset=Genre.objects.all(), required=False)
+        many=False, queryset=Genre.objects.all(), required=True)
     title = serializers.CharField(
         max_length=500, min_length=None, allow_blank=True, required=False, trim_whitespace=True)
 
