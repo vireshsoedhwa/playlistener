@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def file_directory_path(instance, filename):
-    return ('{0}/{1}').format(instance.md5_generated, filename)
+    return ('{0}/{1}/{2}').format(instance.genre, instance.md5_generated, filename)
 
 
 class Genre(models.Model):
@@ -23,7 +23,7 @@ class Genre(models.Model):
                             blank=False, null=False)
 
     def __str__(self):
-        return str(self.id) + " : " + str(self.name)
+        return str(self.name)
 
 
 class Tag(models.Model):
