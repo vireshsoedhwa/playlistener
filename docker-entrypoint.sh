@@ -7,6 +7,7 @@ if [ -z "${DJANGO_SECRET_KEY}" ];then
 fi
 
 mkdir -p /code/logs
+mkdir -p /code/data
 # tail -f /dev/null
 touch /code/logs/task.log
 touch /code/logs/celery.log
