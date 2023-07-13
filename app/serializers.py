@@ -38,6 +38,10 @@ class ArtistListingField(serializers.RelatedField):
     def to_internal_value(self, data):
         return data
 
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = '__all__'
 
 class MediaResourceSerializer(serializers.ModelSerializer):
 

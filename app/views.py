@@ -4,9 +4,9 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
-from .serializers import MediaResourceSerializer
+from .serializers import MediaResourceSerializer, GenreSerializer
 
-from .models import MediaResource
+from .models import MediaResource, Genre
 
 from rest_framework.throttling import BaseThrottle, AnonRateThrottle
 from django.http import Http404, QueryDict
@@ -53,6 +53,12 @@ class PostAnonRateThrottle(AnonRateThrottle):
         if request.method == "GET":
             return True
         return super().allow_request(request, view)
+
+class GenreViewSet(viewsets.ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
+    throttle_classes = [PostAnonRateThrottle]
 
 
 class MediaResourceViewSet(viewsets.ModelViewSet):
@@ -119,6 +125,7 @@ class MediaResourceViewSet(viewsets.ModelViewSet):
 
         mediaresource_serializer = self.get_serializer(mediaresource)
         return Response(mediaresource_serializer.data)
+   
 
     # @action(detail=False, methods=['post'])
     # def multiple_uploads(self, request):
