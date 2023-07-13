@@ -7,12 +7,10 @@ if [ -z "${DJANGO_SECRET_KEY}" ];then
 fi
 
 mkdir -p /code/logs
-mkdir -p /code/data
-# tail -f /dev/null
-touch /code/logs/task.log
-touch /code/logs/celery.log
-cat /dev/null > /code/logs/task.log
-cat /dev/null > /code/logs/celery.log
+# mkdir -p /code/data
+# # tail -f /dev/null
+touch /code/logs/log.log
+cat /dev/null > /code/logs/log.log
 
 >&2 echo "Make Database migrations"
 python manage.py makemigrations app
@@ -27,16 +25,6 @@ mkdir -p /code/app/build/static
 # Collect static files
 >&2 echo "Collect static"
 python manage.py collectstatic --noinput
-
-# >&2 echo "Start Django Q task Scheduler"
-# python manage.py qcluster &
-# echo "-------------------------------------------------------------------------------------------\n"
-
-# celery -A playlistenerapi worker --loglevel=debug --detach worker_hijack_root_logger=False worker_redirect_stdouts_level=DEBUG
-
-celery -A playlistenerapi worker --detach --loglevel=DEBUG --concurrency=2 -n worker1@%h worker_hijack_root_logger=False worker_redirect_stdouts=False worker_redirect_stdouts_level=DEBUG
-
-celery -A playlistenerapi beat --detach --loglevel=DEBUG --scheduler django_celery_beat.schedulers:DatabaseScheduler
 
 >&2 echo "Starting Nginx..."
 nginx

@@ -28,23 +28,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from .tasks import count_items
-
-
 decorators = [never_cache, login_required]
 
 @method_decorator(decorators, name='dispatch')
 class BaseView(TemplateView):
     # template_name = 'index.html'
     extra_context = {'version': settings.VERSION}
-
-def testfunction(request):
-
-    print("hallo")
-    count_items.apply_async()
-
-    return HttpResponse("hello", status=200)
-
 
 class PostAnonRateThrottle(AnonRateThrottle):
     scope = 'post_anon'

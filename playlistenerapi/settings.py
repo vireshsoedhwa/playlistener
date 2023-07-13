@@ -44,8 +44,6 @@ INSTALLED_APPS = [
 
     'corsheaders',
     'rest_framework',
-    # 'django_celery_beat',
-    # 'django_celery_results',
     
     'app'
 ]
@@ -145,21 +143,6 @@ MEDIA_ROOT = '/code/data/'
 # MEDIA_URL =
 FILE_UPLOAD_MAX_MEMORY_SIZE = 20971520 # 20MB
 
-# Q_CLUSTER = {
-#     'name': 'myproject',
-#     'max_attempts': 1,
-#     'retry': 1000,
-#     'workers': 8,
-#     'recycle': 500,
-#     'timeout': 900,
-#     'compress': True,
-#     'cpu_affinity': 1,
-#     'save_limit': 250,
-#     'queue_limit': 500,
-#     'label': 'Django Q',
-#     'orm': 'default'
-# }
-
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
@@ -196,20 +179,6 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'custom'
-        },
-        'celerytask': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/code/logs/task.log',
-            'formatter': 'simple',
-            'maxBytes': 1024 * 1024 * 10,  # 10 mb
-        },        
-        'celery': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/code/logs/celery.log',
-            'formatter': 'simple',
-            'maxBytes': 1024 * 1024 * 10,  # 10 mb
         }
     },
     'loggers': {
@@ -222,26 +191,7 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,
-        },
-        'celery.task': {
-            'handlers': ['celerytask'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'celery': {
-            'handlers': ['celery'],
-            'level': 'DEBUG',
-            'propagate': True,
         }
     },
 }
 
-
-# Celery Configuration Options
-# CELERY_TIMEZONE = "America/Vancouver"
-# CELERY_TASK_TRACK_STARTED = True
-# CELERY_TASK_TIME_LIMIT = 30 * 60
-# CELERY_BROKER_URL = 'redis://redis:6379'
-# CELERYBEAT_LOG_FILE= '/code/celeryd.log'
-
-# CELERY_RESULT_BACKEND = 'django-db'
